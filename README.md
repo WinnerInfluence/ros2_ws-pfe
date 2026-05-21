@@ -62,10 +62,7 @@ bash ~/ros2_ws/scripts/stop_web_demo.sh
 |------|-------------|
 | `src/safe_drl_nav/` | ROS 2 package: agents, Gazebo worlds, checkpoints |
 | `scripts/` | Evaluation harnesses, recording, optional web demo |
-| `docs/` | Entrypoints, disk safety, recording notes |
 | `website/ros/` | Static dashboard assets for the web demo |
-
-Launcher reference: [docs/ENTRYPOINTS.md](docs/ENTRYPOINTS.md).
 
 ## Checkpoints and logs
 

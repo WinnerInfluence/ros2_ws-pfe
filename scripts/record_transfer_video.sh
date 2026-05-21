@@ -12,13 +12,12 @@
 #   VIDEO_MAZE_CONTROL_PERIOD=0.09
 #
 # Between segments: script stops policy + Gazebo, shows title text, waits for Enter.
-# Edit on-screen titles: docs/TRANSFER_VIDEO_STORYBOARD.md
+# Edit on-screen titles: seg*_head / seg*_detail variables below.
 set -euo pipefail
 
 WS="${ROS2_WS:-$HOME/ros2_ws}"
 PKG="$WS/src/safe_drl_nav/safe_drl_nav"
 ROS_DISTRO="${ROS_DISTRO:-humble}"
-STORYBOARD="$WS/docs/TRANSFER_VIDEO_STORYBOARD.md"
 PRESENTATION="$WS/scripts/run_presentation_demo.sh"
 
 # shellcheck source=/dev/null
@@ -128,7 +127,7 @@ _show_title() {
     echo "  ╚══════════════════════════════════════════════════════════════╝"
     echo ""
     echo "  → Record this text as a TITLE CARD in your editor (or hold 5 s on screen)."
-    echo "  → Storyboard / title cards: $STORYBOARD"
+    echo "  → Edit titles: seg*_head / seg*_detail in scripts/record_transfer_video.sh"
     echo ""
 }
 
@@ -183,7 +182,7 @@ seg1_head="TRAINING LAB (in-distribution)"
 seg1_detail="Phase 1: random-goal adaptation (warm-start)
 Phase 2: waypoint curriculum WP1→WP2→WP3
 Policy: sac_actor_maze_best_ever.pth
-(Edit this text in docs/TRANSFER_VIDEO_STORYBOARD.md)"
+(Edit seg1_head / seg1_detail in scripts/record_transfer_video.sh)"
 
 seg2_head="MEDIUM — Zero-shot Egypt"
 seg2_detail="Same lab checkpoint · eval_egypt.world
@@ -215,7 +214,7 @@ echo ""
 echo "  ══════════════════════════════════════════════════════════"
 echo "   TRANSFER VIDEO RECORDER — ${TRANSFER_SEGMENTS} segment(s)"
 echo "  ══════════════════════════════════════════════════════════"
-echo "  Edit title text: $STORYBOARD"
+echo "  Edit title text: seg*_head / seg*_detail in this script"
 echo "  Tip: record each Gazebo clip, add title cards in your video editor."
 echo ""
 
@@ -243,5 +242,4 @@ fi
 
 echo ""
 echo "  All segments done. Assemble in your editor: title → clip → title → clip …"
-echo "  Storyboard: $STORYBOARD"
 echo ""
