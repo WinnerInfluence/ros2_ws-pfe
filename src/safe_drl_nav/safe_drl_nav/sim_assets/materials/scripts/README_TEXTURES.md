@@ -33,7 +33,7 @@ Sky uses Gazebo `<background>` and `<sky><clouds>` in the world file (no sky PNG
 cd ~/ros2_ws/src/safe_drl_nav/safe_drl_nav/sim_assets/scripts
 python3 -c "from generate_eval_worlds import gen_rabat; gen_rabat()"
 pkill -9 -f gzserver
-bash ~/ros2_ws/scripts/record_video_rabat_now.sh
+bash ~/ros2_ws/scripts/local/record_video_rabat_now.sh
 ```
 
 `gen_rabat()` copies PNGs from Desktop and updates `hassan.material` scale from image dimensions.
@@ -41,7 +41,7 @@ bash ~/ros2_ws/scripts/record_video_rabat_now.sh
 Optional resize (faster Gazebo load):
 
 ```bash
-bash ~/ros2_ws/scripts/resize_hassan_textures.sh
+bash ~/ros2_ws/scripts/local/resize_hassan_textures.sh
 ```
 
 **Recommended aspect ratios:** pillar ~1:3, floor tile ~2:1, tower ~4:5 or 3:4. Re-run `gen_rabat()` after replacing Desktop PNGs.

@@ -49,11 +49,10 @@ Frozen cross-world evaluation (thesis tables, n=33):
 bash ~/ros2_ws/scripts/run_thesis_crossworld_sac.sh
 ```
 
-Optional public web demo (requires local `sim_demo.env` from `sim_demo.env.example`):
+Short presentation demo (Gazebo + robot already running):
 
 ```bash
-bash ~/ros2_ws/scripts/start_web_demo.sh sac
-bash ~/ros2_ws/scripts/stop_web_demo.sh
+bash ~/ros2_ws/scripts/run_presentation_demo.sh
 ```
 
 ## Repository layout
@@ -61,8 +60,8 @@ bash ~/ros2_ws/scripts/stop_web_demo.sh
 | Path | Description |
 |------|-------------|
 | `src/safe_drl_nav/` | ROS 2 package: agents, Gazebo worlds, checkpoints |
-| `scripts/` | Evaluation harnesses, recording, optional web demo |
-| `website/ros/` | Static dashboard assets for the web demo |
+| `scripts/` | Thesis eval, demo, screenshots (`scripts/local/` is local-only) |
+| `website/ros/` | Static dashboard assets (optional web demo) |
 
 ## Checkpoints and logs
 

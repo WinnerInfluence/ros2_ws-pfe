@@ -8,8 +8,7 @@
 #
 # Same harness as eval_trainlab.json: --paper-eval, n=33, sample SAC, shield ON.
 #
-# Usage (workstation with Gazebo GUI):
-#   ~/ros2_ws/scripts/stop_web_demo.sh
+# Usage (workstation with Gazebo GUI; close any web demo first):
 #   bash ~/ros2_ws/scripts/run_thesis_crossworld_sac.sh
 #
 # Env overrides:
@@ -321,7 +320,6 @@ if [[ ! -f "$BEST_EVER" ]]; then
     exit 1
 fi
 
-"$WS_PATH/scripts/stop_web_demo.sh" 2>/dev/null || true
 _kill_stale
 
 _g "Thesis cross-world SAC eval"

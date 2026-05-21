@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Shared Gazebo / gnome-terminal environment for PFE launchers (train_menu, start_pfe, …).
 #
-# Reliable GUI:  bash ~/ros2_ws/scripts/kill_gazebo.sh && bash ~/ros2_ws/scripts/open_gazebo.sh
+# Reliable GUI:  pkill -9 gzserver gzclient; then train_menu / start_pfe launchers
 # Avoid leaving gzserver running without gzclient (thesis EVAL_KILL_GUI=1) — blocks the next launch.
 
 # Default Gazebo master (gzclient freezes on "Preparing your world" if port is stale).
@@ -172,10 +172,10 @@ pfe_gazebo_wait_gzserver() {
                 return 0
             fi
         elif (( seen )); then
-            echo "[gazebo] ERROR: gzserver exited during load. Run: bash ~/ros2_ws/scripts/kill_gazebo.sh" >&2
+            echo "[gazebo] ERROR: gzserver exited during load. Run: pkill -9 gzserver gzclient" >&2
             return 1
         elif (( t >= grace_sec )); then
-            echo "[gazebo] ERROR: gzserver never started (port 11345 busy?). Run: bash ~/ros2_ws/scripts/kill_gazebo.sh" >&2
+            echo "[gazebo] ERROR: gzserver never started (port 11345 busy?). Run: pkill -9 gzserver gzclient" >&2
             return 1
         fi
         sleep 3

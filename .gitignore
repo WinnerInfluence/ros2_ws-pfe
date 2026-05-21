@@ -64,8 +64,9 @@ pfe_logs/
 src/safe_drl_nav/safe_drl_nav/pfe_logs/*.json
 src/safe_drl_nav/safe_drl_nav/trained_models/uploaded_brain.pth
 
-# Local notes (not published)
+# Local notes / operator tooling (not published)
 docs/
+scripts/local/
 
 # Temp
 /tmp/

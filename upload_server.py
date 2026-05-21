@@ -70,7 +70,7 @@ SIM_DEMO_PAPER_EVAL = os.environ.get("SIM_DEMO_PAPER_EVAL", "0").strip().lower()
 SIM_DEMO_EVAL_EPISODES = int(os.environ.get("SIM_DEMO_EVAL_EPISODES", "5"))
 DEFAULT_WAYPOINT_GOAL_RADIUS = os.environ.get("SIM_DEMO_WAYPOINT_GOAL_RADIUS", "0.68")
 
-# Live LiDAR for /lidar_live — written by scripts/upload_telemetry_sidecar.py (not in-process ROS).
+# Live LiDAR for /lidar_live — written by scripts/local/upload_telemetry_sidecar.py (not in-process ROS).
 TELEMETRY_FILE = Path(
     os.environ.get("TELEMETRY_FILE", str(SCRIPT_DIR / "pfe_logs" / "telemetry_live.json"))
 )
@@ -367,7 +367,7 @@ def upload():
             if reload_ok
             else (
                 "Saved weights but could not publish /policy_reload "
-                "(start: ~/ros2_ws/scripts/start_hot_swap_for_web.sh "
+                "(start: ~/ros2_ws/scripts/local/start_hot_swap_for_web.sh "
                 f"{algo} — or restart upload_server after fixing ROS)."
             )
         )
