@@ -1,0 +1,321 @@
+{
+  "algo": "sac",
+  "model_path": "/home/anon/ros2_ws/src/safe_drl_nav/safe_drl_nav/trained_models/sac_actor_phase3_egypt.pth",
+  "timestamp": "2026-05-17T07:00:47Z",
+  "waypoints": [
+    [
+      -2.8,
+      -1.8
+    ],
+    [
+      -4.5,
+      -0.2
+    ],
+    [
+      -3.2,
+      1.2
+    ]
+  ],
+  "eval_config": {
+    "harness": "SafeNavAgent_step_environment",
+    "max_steps_per_episode": 4000,
+    "env_step_sleep_sec": 0.05,
+    "shield": true,
+    "waypoint_goal_radius_cli": 0.68,
+    "waypoint_clear_radius_m": 0.68,
+    "sac_action": "sample",
+    "td3_policy_noise_std": 0.0,
+    "reset_fire_and_forget": true,
+    "reset_service_wait_sec": 45.0,
+    "pfe_world": "/home/anon/ros2_ws/src/safe_drl_nav/safe_drl_nav/sim_assets/worlds/eval_egypt.world",
+    "paper_eval": true,
+    "require_reset": true,
+    "episodes_run": 33,
+    "training_contract_path": "/home/anon/ros2_ws/src/safe_drl_nav/safe_drl_nav/training_contract.yaml"
+  },
+  "episodes": [
+    {
+      "episode": 1,
+      "reward": 863.115,
+      "steps": 2040,
+      "waypoints_cleared": 3,
+      "solved": true,
+      "shield_active": true
+    },
+    {
+      "episode": 2,
+      "reward": 657.637,
+      "steps": 2451,
+      "waypoints_cleared": 3,
+      "solved": true,
+      "shield_active": true
+    },
+    {
+      "episode": 3,
+      "reward": 690.33,
+      "steps": 2116,
+      "waypoints_cleared": 3,
+      "solved": true,
+      "shield_active": true
+    },
+    {
+      "episode": 4,
+      "reward": 300.603,
+      "steps": 4000,
+      "waypoints_cleared": 2,
+      "solved": false,
+      "shield_active": true
+    },
+    {
+      "episode": 5,
+      "reward": 712.669,
+      "steps": 1668,
+      "waypoints_cleared": 3,
+      "solved": true,
+      "shield_active": true
+    },
+    {
+      "episode": 6,
+      "reward": 748.753,
+      "steps": 1532,
+      "waypoints_cleared": 3,
+      "solved": true,
+      "shield_active": true
+    },
+    {
+      "episode": 7,
+      "reward": 177.034,
+      "steps": 4000,
+      "waypoints_cleared": 1,
+      "solved": false,
+      "shield_active": true
+    },
+    {
+      "episode": 8,
+      "reward": 710.106,
+      "steps": 1350,
+      "waypoints_cleared": 3,
+      "solved": true,
+      "shield_active": true
+    },
+    {
+      "episode": 9,
+      "reward": 211.38,
+      "steps": 4000,
+      "waypoints_cleared": 2,
+      "solved": false,
+      "shield_active": true
+    },
+    {
+      "episode": 10,
+      "reward": 230.646,
+      "steps": 4000,
+      "waypoints_cleared": 2,
+      "solved": false,
+      "shield_active": true
+    },
+    {
+      "episode": 11,
+      "reward": 217.264,
+      "steps": 4000,
+      "waypoints_cleared": 2,
+      "solved": false,
+      "shield_active": true
+    },
+    {
+      "episode": 12,
+      "reward": 323.691,
+      "steps": 4000,
+      "waypoints_cleared": 2,
+      "solved": false,
+      "shield_active": true
+    },
+    {
+      "episode": 13,
+      "reward": 687.148,
+      "steps": 3571,
+      "waypoints_cleared": 3,
+      "solved": true,
+      "shield_active": true
+    },
+    {
+      "episode": 14,
+      "reward": 284.257,
+      "steps": 4000,
+      "waypoints_cleared": 2,
+      "solved": false,
+      "shield_active": true
+    },
+    {
+      "episode": 15,
+      "reward": 717.864,
+      "steps": 1646,
+      "waypoints_cleared": 3,
+      "solved": true,
+      "shield_active": true
+    },
+    {
+      "episode": 16,
+      "reward": 206.189,
+      "steps": 4000,
+      "waypoints_cleared": 2,
+      "solved": false,
+      "shield_active": true
+    },
+    {
+      "episode": 17,
+      "reward": 417.032,
+      "steps": 4000,
+      "waypoints_cleared": 2,
+      "solved": false,
+      "shield_active": true
+    },
+    {
+      "episode": 18,
+      "reward": 190.55,
+      "steps": 4000,
+      "waypoints_cleared": 2,
+      "solved": false,
+      "shield_active": true
+    },
+    {
+      "episode": 19,
+      "reward": 687.925,
+      "steps": 2512,
+      "waypoints_cleared": 3,
+      "solved": true,
+      "shield_active": true
+    },
+    {
+      "episode": 20,
+      "reward": 650.515,
+      "steps": 3005,
+      "waypoints_cleared": 3,
+      "solved": true,
+      "shield_active": true
+    },
+    {
+      "episode": 21,
+      "reward": 275.404,
+      "steps": 4000,
+      "waypoints_cleared": 2,
+      "solved": false,
+      "shield_active": true
+    },
+    {
+      "episode": 22,
+      "reward": 192.846,
+      "steps": 4000,
+      "waypoints_cleared": 2,
+      "solved": false,
+      "shield_active": true
+    },
+    {
+      "episode": 23,
+      "reward": 209.387,
+      "steps": 4000,
+      "waypoints_cleared": 2,
+      "solved": false,
+      "shield_active": true
+    },
+    {
+      "episode": 24,
+      "reward": 68.913,
+      "steps": 4000,
+      "waypoints_cleared": 1,
+      "solved": false,
+      "shield_active": true
+    },
+    {
+      "episode": 25,
+      "reward": 293.806,
+      "steps": 4000,
+      "waypoints_cleared": 2,
+      "solved": false,
+      "shield_active": true
+    },
+    {
+      "episode": 26,
+      "reward": 232.632,
+      "steps": 4000,
+      "waypoints_cleared": 2,
+      "solved": false,
+      "shield_active": true
+    },
+    {
+      "episode": 27,
+      "reward": 384.007,
+      "steps": 4000,
+      "waypoints_cleared": 2,
+      "solved": false,
+      "shield_active": true
+    },
+    {
+      "episode": 28,
+      "reward": 718.315,
+      "steps": 1326,
+      "waypoints_cleared": 3,
+      "solved": true,
+      "shield_active": true
+    },
+    {
+      "episode": 29,
+      "reward": 740.243,
+      "steps": 839,
+      "waypoints_cleared": 3,
+      "solved": true,
+      "shield_active": true
+    },
+    {
+      "episode": 30,
+      "reward": 395.583,
+      "steps": 4000,
+      "waypoints_cleared": 2,
+      "solved": false,
+      "shield_active": true
+    },
+    {
+      "episode": 31,
+      "reward": 759.828,
+      "steps": 1315,
+      "waypoints_cleared": 3,
+      "solved": true,
+      "shield_active": true
+    },
+    {
+      "episode": 32,
+      "reward": 679.391,
+      "steps": 2836,
+      "waypoints_cleared": 3,
+      "solved": true,
+      "shield_active": true
+    },
+    {
+      "episode": 33,
+      "reward": 265.014,
+      "steps": 4000,
+      "waypoints_cleared": 2,
+      "solved": false,
+      "shield_active": true
+    }
+  ],
+  "summary": {
+    "episodes_total": 33,
+    "episodes_solved": 14,
+    "success_rate": 0.4242,
+    "episodes_reached_at_least_one_wp": 33,
+    "fraction_reached_at_least_one_wp": 1.0,
+    "episodes_on_final_waypoint_leg": 31,
+    "fraction_on_final_waypoint_leg": 0.9394,
+    "best_waypoints_cleared_single_episode": 3,
+    "mean_reward": 451.517,
+    "std_reward": 237.873,
+    "min_reward": 68.913,
+    "max_reward": 863.115,
+    "mean_waypoints": 2.364,
+    "std_waypoints": 0.594,
+    "mean_steps": 3157.8,
+    "std_steps": 1095.0,
+    "total_waypoints_possible": 3
+  }
+}

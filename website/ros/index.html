@@ -1,0 +1,1264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate">
+<!-- ros-live-v14 -->
+<title>Neural Nav · Fast Adaptation Lab</title>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:       #050912;
+  --surface:  #0b1525;
+  --border:   #162035;
+  --accent:   #00d4ff;
+  --green:    #00ff88;
+  --red:      #ff4455;
+  --orange:   #ff8800;
+  --yellow:   #ffcc00;
+  --text:     #c8e0f8;
+  --muted:    #3a5878;
+  --radius:   10px;
+}
+
+html, body { height: 100%; min-height: 100%; background: #050912; color: #c8e0f8;
+  font-family: 'Segoe UI', system-ui, sans-serif; overflow: hidden; }
+
+noscript { display: block; padding: 20px; background: #200; color: #fff; text-align: center; }
+
+#app { display: flex; flex-direction: column; height: 100vh; height: 100dvh; }
+
+#hdr {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 10px 18px; background: rgba(5,9,18,.95);
+  border-bottom: 1px solid #162035; flex-shrink: 0; gap: 12px;
+  z-index: 10;
+}
+#hdr-left { display: flex; align-items: center; gap: 12px; }
+#hdr h1 { font-size: 1.1rem; font-weight: 700; color: #00d4ff; letter-spacing: .5px; }
+#hdr h1 em { color: #c8e0f8; font-style: normal; font-weight: 400; font-size: .85rem; margin-left: 8px; }
+.hex { font-size: 1.5rem; }
+
+#ws-pill {
+  display: flex; align-items: center; gap: 7px;
+  padding: 5px 13px; border-radius: 20px;
+  border: 1px solid #ff4455; color: #ff4455;
+  font-size: .75rem; font-weight: 700; letter-spacing: .4px;
+}
+#ws-pill.on { border-color: #00ff88; color: #00ff88; }
+.dot { width: 8px; height: 8px; border-radius: 50%; background: currentColor; }
+#ws-pill.on .dot { animation: pulse 1.4s ease-in-out infinite; }
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.3} }
+
+#mid { display: flex; flex: 1; overflow: hidden; min-height: 0; }
+
+#viewport { position: relative; flex: 1 1 auto; min-width: 0; min-height: 120px; overflow: hidden; background: #050912; }
+#arena { display: block; width: 100%; height: 100%; touch-action: none; }
+
+#env-label {
+  position: absolute; top: 12px; left: 50%; transform: translateX(-50%);
+  background: rgba(5,9,18,.85); border: 1px solid #162035;
+  padding: 4px 14px; border-radius: 20px;
+  font-size: .78rem; color: #00d4ff; pointer-events: none;
+}
+#ep-overlay {
+  position: absolute; bottom: 12px; left: 12px;
+  background: rgba(5,9,18,.85); border: 1px solid #162035;
+  padding: 6px 12px; border-radius: 8px;
+  font-size: .75rem; color: #3a5878; font-family: monospace;
+  pointer-events: none;
+}
+#ep-overlay span { color: #00d4ff; font-weight: 700; }
+
+#panel {
+  width: 280px; flex-shrink: 0;
+  display: flex; flex-direction: column; gap: 8px;
+  padding: 10px 10px 10px 6px; overflow-y: auto;
+  background: rgba(5,9,18,.75);
+  border-left: 1px solid #162035;
+}
+.pcard {
+  background: #0b1525; border: 1px solid #162035;
+  border-radius: 10px; padding: 12px 14px;
+}
+.pcard-label {
+  font-size: .65rem; text-transform: uppercase; letter-spacing: 1.2px;
+  color: #3a5878; margin-bottom: 8px;
+}
+
+#adapt-score {
+  font-size: 3rem; font-weight: 800; color: #00ff88;
+  font-variant-numeric: tabular-nums; line-height: 1;
+}
+#adapt-score.bad  { color: #ff4455; }
+#adapt-score.mid  { color: #ffcc00; }
+#adapt-sub { font-size: .72rem; color: #3a5878; margin-top: 4px; }
+
+.mets { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.met label { display: block; font-size: .62rem; color: #3a5878;
+  text-transform: uppercase; letter-spacing: .8px; margin-bottom: 3px; }
+.met .mv { font-size: 1.15rem; font-weight: 700; color: #00d4ff;
+  font-variant-numeric: tabular-nums; }
+.mv.ok  { color: #00ff88; }
+.mv.bad { color: #ff4455; }
+
+#rchart { width: 100%; height: 90px; display: block; }
+
+.env-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+.env-btn {
+  background: transparent; border: 1px solid #162035; border-radius: 8px;
+  color: #3a5878; font-size: .72rem; padding: 6px 8px; cursor: pointer;
+  text-align: left; line-height: 1.3;
+}
+.env-btn:hover { border-color: #00d4ff; color: #c8e0f8; }
+.env-btn.active { border-color: #00d4ff; color: #00d4ff; background: rgba(0,212,255,.07); }
+.env-btn strong { display: block; font-size: .73rem; margin-bottom: 2px; }
+.env-btn small  { font-size: .62rem; color: #3a5878; display: block; }
+
+.ep-row { display: flex; align-items: center; gap: 8px; }
+.ep-row label { font-size: .72rem; color: #3a5878; white-space: nowrap; }
+#ep-input { flex: 1; background: #050912; border: 1px solid #162035;
+  border-radius: 6px; color: #c8e0f8; padding: 5px 8px; font-size: .82rem;
+  width: 60px; }
+#ep-input:focus { outline: none; border-color: #00d4ff; }
+
+#bottom {
+  flex-shrink: 0; display: flex; gap: 8px; padding: 8px 10px;
+  background: rgba(5,9,18,.95); border-top: 1px solid #162035;
+  flex-wrap: wrap;
+}
+
+.bcard {
+  background: #0b1525; border: 1px solid #162035;
+  border-radius: 10px; padding: 10px 14px; flex: 1; min-width: 240px;
+}
+.bcard h3 { font-size: .65rem; text-transform: uppercase; letter-spacing: 1px;
+  color: #3a5878; margin-bottom: 8px; }
+
+.upload-row { display: flex; gap: 8px; flex-wrap: wrap; align-items: flex-end; }
+.fdrop {
+  border: 1.5px dashed #162035; border-radius: 7px; padding: 8px 12px;
+  text-align: center; cursor: pointer; font-size: .75rem; color: #3a5878;
+  position: relative; flex: 1; min-width: 150px;
+}
+.fdrop:hover, .fdrop.over { border-color: #00d4ff; color: #00d4ff;
+  background: rgba(0,212,255,.05); }
+.fdrop input { position: absolute; inset:0; opacity:0; cursor:pointer; }
+#upload-status { font-size:.75rem; min-height:1.3em; margin-top:6px; color:#00d4ff; }
+#upload-status.err { color:#ff4455; }
+#upload-status.ok { color:#00ff88; }
+#econsole { display:block !important; min-height:52px; }
+#fname { font-size: .68rem; color: #00d4ff; min-height: 13px; margin-top: 3px; }
+.form-sel { background: #050912; border: 1px solid #162035; border-radius:6px;
+  color: #c8e0f8; padding: 5px 8px; font-size: .8rem; }
+
+.btn-primary {
+  background: #00d4ff; color: #050912; border: none; border-radius: 8px;
+  padding: 8px 18px; font-size: .82rem; font-weight: 700; cursor: pointer;
+  white-space: nowrap;
+}
+.btn-primary:disabled { opacity: .3; cursor: not-allowed; }
+
+.btn-cancel {
+  background: transparent; color: #ff4455; border: 1px solid #ff4455;
+  border-radius: 8px; padding: 7px 13px; font-size: .78rem; font-weight: 600;
+  cursor: pointer; display: none;
+}
+
+#econsole {
+  background: #050912; border: 1px solid #162035; border-radius: 7px;
+  padding: 7px 10px; font-family: monospace; font-size: .68rem; color: #3a5878;
+  height: 68px; overflow-y: auto; margin-top: 8px; display: none;
+}
+#econsole.vis { display: block; }
+#econsole .ok  { color: #00ff88; }
+#econsole .err { color: #ff4455; }
+#econsole .inf { color: #00d4ff; }
+
+#eval-badge {
+  font-size: .72rem; font-weight: 700; padding: 2px 9px; border-radius: 10px;
+  border: 1px solid transparent; margin-left: 8px; display: none;
+}
+#eval-badge.vis.run { display:inline; color:#ffcc00; border-color:#ffcc00; }
+#eval-badge.vis.done{ display:inline; color:#00ff88; border-color:#00ff88; }
+#eval-badge.vis.err { display:inline; color:#ff4455; border-color:#ff4455; }
+
+#eval-summary { display:none; margin-top:8px; }
+#eval-summary.vis { display:block; }
+.sums { display:grid; grid-template-columns:repeat(auto-fill,minmax(110px,1fr)); gap:6px; }
+.sum-item { background:#050912; border:1px solid #162035; border-radius:7px;
+  padding:8px 10px; }
+.sum-item label { display:block; font-size:.6rem; color:#3a5878;
+  text-transform:uppercase; letter-spacing:.8px; margin-bottom:3px; }
+.sum-item .sv { font-size:.95rem; font-weight:700; color:#00ff88; }
+
+#ws-log { background: #050912; border:1px solid #162035; border-radius:7px;
+  padding:6px 10px; font-family:monospace; font-size:.67rem; color:#3a5878;
+  height:68px; overflow-y:auto; }
+
+::-webkit-scrollbar { width:4px; height:4px; }
+::-webkit-scrollbar-thumb { background: #162035; border-radius:4px; }
+
+@media (max-width: 700px) {
+  #panel { display: none; }
+  #bottom { flex-direction: column; max-height: 45vh; overflow-y: auto; }
+}
+
+/* pfe-academic-hdr-v2 */
+#hdr {
+  flex-direction: column;
+  align-items: stretch;
+  padding: 0;
+  gap: 0;
+}
+.hdr-pfe-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 10px 20px 9px;
+  background: linear-gradient(90deg, rgba(0,212,255,.08) 0%, rgba(5,9,18,.95) 40%, rgba(0,255,136,.05) 100%);
+  border-bottom: 1px solid #162035;
+  flex-wrap: wrap;
+}
+.hdr-pfe-logo {
+  height: 54px;
+  width: auto;
+  max-width: 112px;
+  object-fit: contain;
+  filter: drop-shadow(0 1px 3px rgba(0,0,0,.5));
+}
+.hdr-pfe-center {
+  flex: 1;
+  min-width: 200px;
+  text-align: center;
+  line-height: 1.3;
+}
+.hdr-pfe-uni {
+  font-size: .78rem;
+  font-weight: 700;
+  letter-spacing: .07em;
+  text-transform: uppercase;
+  color: #00d4ff;
+}
+.hdr-pfe-sub {
+  font-size: .72rem;
+  color: #3a5878;
+  margin-top: 2px;
+}
+.hdr-pfe-year {
+  display: inline-block;
+  margin-top: 5px;
+  padding: 3px 11px;
+  border-radius: 999px;
+  font-size: .72rem;
+  font-weight: 700;
+  color: #ffcc00;
+  border: 1px solid rgba(255,204,0,.35);
+}
+.hdr-pfe-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-size: .72rem;
+  color: #c8e0f8;
+  min-width: 148px;
+}
+.hdr-pfe-meta.right { text-align: right; align-items: flex-end; }
+.hdr-pfe-meta label {
+  font-size: .62rem;
+  text-transform: uppercase;
+  letter-spacing: .1em;
+  color: #3a5878;
+}
+.hdr-pfe-meta .nm { font-weight: 700; font-size: .8rem; color: #c8e0f8; }
+.hdr-pfe-meta .sup { font-weight: 600; font-size: .74rem; color: #00d4ff; }
+.hdr-main-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 20px;
+  gap: 12px;
+}
+@media (max-width: 720px) {
+  .hdr-pfe-meta { display: none; }
+  .hdr-pfe-logo { height: 44px; max-width: 92px; }
+}
+
+</style>
+</head>
+<body>
+
+<noscript>
+  <strong>JavaScript is required</strong> for the Neural Nav lab. Enable JavaScript and reload.
+</noscript>
+
+<div id="app">
+
+<header id="hdr">
+  <div class="hdr-pfe-row">
+    <img class="hdr-pfe-logo" src="/ros/demo_assets/uae.png" alt="Université Abdelmalek Essaâdi" />
+    <div class="hdr-pfe-center">
+      <div class="hdr-pfe-uni">Université Abdelmalek Essaâdi · FST Al Hoceima</div>
+      <div class="hdr-pfe-sub">MST Embedded Systems &amp; Robotics (SER) — PFE demo</div>
+      <span class="hdr-pfe-year">2025/2026</span>
+    </div>
+    <img class="hdr-pfe-logo" src="/ros/demo_assets/fsth.png" alt="FST Al Hoceima" />
+    <div class="hdr-pfe-meta">
+      <label>Author</label>
+      <span class="nm">RABEH Houssam Eddine</span>
+    </div>
+    <div class="hdr-pfe-meta right">
+      <label>Supervisors</label>
+      <span class="sup">Pr. Nabil El Akchioui</span>
+      <span class="sup">Pr. Walid Jebrane</span>
+    </div>
+  </div>
+  <div class="hdr-main-row">
+  <div id="hdr-left">
+    <span class="hex">⬡</span>
+    <h1>Neural Nav <em>· Fast Adaptation Lab</em></h1>
+  </div>
+  <div style="display:flex;align-items:center;gap:12px">
+    <div id="ws-pill"><span class="dot"></span><span id="ws-text">OFFLINE</span><span id="build-tag" style="font-size:.65rem;color:#3a5878;margin-left:6px">v14</span></div>
+  </div>
+  </div>
+</header>
+
+<div id="mid">
+
+  <div id="viewport">
+    <canvas id="arena"></canvas>
+    <div id="env-label">Environment: Maze · 3 waypoints</div>
+    <div id="ep-overlay">Ep <span id="ep-num">—</span> · Step <span id="step-num">—</span></div>
+  </div>
+
+  <div id="panel">
+    <div class="pcard">
+      <div class="pcard-label">Adaptation Score</div>
+      <div id="adapt-score">—</div>
+      <div id="adapt-sub">waiting for first episode…</div>
+    </div>
+    <div class="pcard">
+      <div class="pcard-label">Live Metrics</div>
+      <div class="mets">
+        <div class="met"><label>Episode</label><div class="mv" id="m-ep">—</div></div>
+        <div class="met"><label>Success Rate</label><div class="mv" id="m-sr">—</div></div>
+        <div class="met"><label>Cur. Reward</label><div class="mv" id="m-rew">—</div></div>
+        <div class="met"><label>Total Reward</label><div class="mv" id="m-tot">—</div></div>
+      </div>
+    </div>
+    <div class="pcard">
+      <div class="pcard-label">Episode Rewards</div>
+      <canvas id="rchart"></canvas>
+    </div>
+    <div class="pcard">
+      <div class="pcard-label">Environment</div>
+      <div class="env-btns">
+        <button type="button" class="env-btn active" data-env="0">
+          <strong>Maze (3 WP)</strong><small>Training corridor</small>
+        </button>
+        <button type="button" class="env-btn" data-env="1">
+          <strong>Corridor</strong><small>Narrow passage</small>
+        </button>
+        <button type="button" class="env-btn" data-env="2">
+          <strong>Dense Grid</strong><small>High density</small>
+        </button>
+        <button type="button" class="env-btn" data-env="3">
+          <strong>Dynamic</strong><small>Shifts each ep.</small>
+        </button>
+      </div>
+    </div>
+    <div class="pcard">
+      <div class="pcard-label">Episodes</div>
+      <div class="ep-row">
+        <label>Count</label>
+        <input type="number" id="ep-input" value="10" min="1" max="50">
+        <button type="button" class="btn-primary" id="apply-ep-btn" style="padding:5px 12px;font-size:.75rem">Apply</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="bottom">
+  <div class="bcard">
+    <h3>Upload Model <span id="eval-badge"></span></h3>
+    <div class="upload-row">
+      <div style="flex:1;min-width:150px">
+        <div class="fdrop" id="fdrop">
+          <input type="file" id="model-file" accept=".pth,.PTH,application/octet-stream">
+          Drop .pth or click to browse
+        </div>
+        <div id="fname"></div>
+        <div id="upload-status" class="upload-status"></div>
+      </div>
+      <select class="form-sel" id="algo-sel">
+        <option value="sac">SAC</option>
+        <option value="td3">TD3</option>
+        <option value="custom">Custom</option>
+      </select>
+      <button type="button" class="btn-primary" id="upload-btn" disabled>Upload &amp; Eval</button>
+      <button type="button" class="btn-cancel" id="cancel-btn">Cancel</button>
+    </div>
+    <div id="econsole"></div>
+    <div id="eval-summary"><div class="sums" id="sums-grid"></div></div>
+  </div>
+  <div class="bcard" style="max-width:340px">
+    <h3>Bridge Log</h3>
+    <div id="ws-log">Initialising…</div>
+  </div>
+</div>
+
+</div>
+
+
+<script>
+(function () {
+  var API = (location.protocol === 'https:')
+    ? (location.origin + '/ros/api')
+    : ('http://' + (location.hostname || 'localhost') + ':5001/ros/api');
+  var KEY = (window.__ROS_CONFIG__ && window.__ROS_CONFIG__.uploadApiKey) || '';
+
+  function $(id) { return document.getElementById(id); }
+  function setStatus(msg, cls) {
+    var el = $('upload-status');
+    if (!el) return;
+    el.textContent = msg;
+    el.className = 'upload-status' + (cls ? ' ' + cls : '');
+  }
+  function elog(msg, cls) {
+    var c = $('econsole');
+    if (!c) return;
+    c.classList.add('vis');
+    var d = document.createElement('div');
+    if (cls) d.className = cls;
+    d.textContent = msg;
+    c.appendChild(d);
+    c.scrollTop = c.scrollHeight;
+  }
+  function apiUpload(url, opts) {
+    opts = opts || {};
+    var h = new Headers(opts.headers || {});
+    if (KEY) h.set('X-API-Key', KEY);
+    opts.headers = h;
+    return fetch(url, opts);
+  }
+
+  function wire() {
+    var inp = $('model-file');
+    var btn = $('upload-btn');
+    var fn = $('fname');
+    if (!inp || !btn) return;
+
+    function onPick() {
+      var f = inp.files && inp.files[0];
+      if (!f) return;
+      if (!(f.name || '').toLowerCase().endsWith('.pth')) {
+        setStatus('Choose a .pth checkpoint file', 'err');
+        btn.disabled = true;
+        return;
+      }
+      if (fn) fn.textContent = f.name;
+      btn.disabled = false;
+      btn.removeAttribute('disabled');
+      setStatus('Ready — click Upload & Eval', '');
+    }
+    inp.addEventListener('change', onPick);
+    inp.addEventListener('input', onPick);
+
+    btn.addEventListener('click', function () {
+      var f = inp.files && inp.files[0];
+      if (!f) {
+        setStatus('Select a .pth file first', 'err');
+        return;
+      }
+      btn.disabled = true;
+      setStatus('Uploading… (wait ~5–10 s)', '');
+      var ec = $('econsole');
+      if (ec) ec.innerHTML = '';
+      elog('POST ' + API + '/upload', 'inf');
+      var form = new FormData();
+      form.append('file', f);
+      form.append('algo', ($('algo-sel') && $('algo-sel').value) || 'sac');
+      form.append('episodes', ($('ep-input') && $('ep-input').value) || '10');
+      form.append('spawn_eval', 'false');
+
+      apiUpload(API + '/upload', { method: 'POST', body: form })
+        .then(function (r) {
+          return r.text().then(function (text) {
+            var d;
+            try { d = JSON.parse(text); } catch (e) {
+              d = { error: text ? text.slice(0, 200) : ('HTTP ' + r.status) };
+            }
+            return { r: r, d: d };
+          });
+        })
+        .then(function (x) {
+          btn.disabled = false;
+          if (!x.r.ok || x.d.error) {
+            var err = x.d.error || x.d.message || ('HTTP ' + x.r.status);
+            setStatus('Failed: ' + err, 'err');
+            elog(err, 'err');
+            return;
+          }
+          setStatus(x.d.message || 'Weights saved on simulation host', 'ok');
+          elog(x.d.message || 'OK', 'ok');
+          if (!x.d.reload_pub) {
+            elog('Run: ~/ros2_ws/scripts/start_hot_swap_for_web.sh sac', 'inf');
+          }
+        })
+        .catch(function (e) {
+          btn.disabled = false;
+          setStatus('Network error — run start_sim_demo_remote.sh on simulation host', 'err');
+          elog('Upload failed: ' + (e && e.message ? e.message : 'network'), 'err');
+        });
+    });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', wire);
+  } else {
+    wire();
+  }
+})();
+</script>
+
+<script src="config.js?v=14"></script>
+<script>
+(function () {
+  'use strict';
+
+  var HOST = window.location.hostname || 'localhost';
+  var SECURE = (location.protocol === 'https:');
+  var ORIGIN = window.location.origin;
+  /* Same-origin /ros — production proxies to SIM machine (upload :5001, ws :9090). */
+  var ROS_BASE = '/ros';
+  var UPLOAD_API_KEY = (window.__ROS_CONFIG__ && window.__ROS_CONFIG__.uploadApiKey) || '';
+  var HOSTPORT = window.location.host || HOST;
+  var WS_URL;
+  var API;
+  if (SECURE) {
+    WS_URL = 'wss://' + HOSTPORT + ROS_BASE + '/ws';
+    API = ORIGIN + ROS_BASE + '/api';
+  } else {
+    WS_URL = 'ws://' + HOST + ':9090';
+    API = 'http://' + HOST + ':5001/ros/api';
+  }
+
+
+  /* ros-live-v3: early HTTP poll (works even if user had old cache for rest of bundle) */
+  (function bootLivePoll() {
+    var api = SECURE ? (ORIGIN + ROS_BASE + '/api') : ('http://' + HOST + ':5001/ros/api');
+    function tick() {
+      fetch(api + '/lidar_live', { cache: 'no-store', credentials: 'same-origin' })
+        .then(function (r) { return r.ok ? r.json() : null; })
+        .then(function (snap) {
+          if (!snap || !snap.ok) return;
+          var age = (Date.now() / 1000) - (snap.updated_at || 0);
+          if (age > 30) return;
+          var pill = document.getElementById('ws-pill');
+          var txt = document.getElementById('ws-text');
+          if (pill) pill.classList.add('on');
+          if (txt) txt.textContent = 'LIVE';
+          if (typeof window.__applyLidarSnap === 'function') {
+            window.__applyLidarSnap(snap);
+          }
+        })
+        .catch(function () {});
+    }
+    tick();
+    setInterval(tick, 350);
+  })();
+
+  function apiFetch(url, opts) {
+    opts = opts || {};
+    var headers = new Headers(opts.headers || {});
+    if (UPLOAD_API_KEY) headers.set('X-API-Key', UPLOAD_API_KEY);
+    opts.headers = headers;
+    return fetch(url, opts);
+  }
+
+  var vp = document.getElementById('viewport');
+  var arena = document.getElementById('arena');
+  var actx = arena.getContext('2d');
+  if (!actx) {
+    document.getElementById('ws-log').textContent = 'Canvas 2D not available in this browser.';
+    return;
+  }
+
+  /* Corridor maze (eval_maze.world / maze_web_layout) — not the random pillar lab. */
+  var MAZE_WORLD = { xmin: -5.4, xmax: 0.6, ymin: -3.4, ymax: 2.6 };
+  var WORLD = {
+    xmin: MAZE_WORLD.xmin, xmax: MAZE_WORLD.xmax,
+    ymin: MAZE_WORLD.ymin, ymax: MAZE_WORLD.ymax
+  };
+  var VIEW = {
+    obstacles: [],
+    waypoints: [],
+    wp_idx: 0,
+    goal: { x: -2.8, y: -1.8 },
+    rx: -2.0, ry: -2.0, yaw: 0,
+    scan: null,
+    trail: [],
+    pulse: 0,
+    lastHit: false,
+    lastOk: false
+  };
+
+  function fitWorldToRobot(rx, ry) {
+    if (rx == null || ry == null || isNaN(rx) || isNaN(ry)) return;
+    var pad = 0.85;
+    var xmin = Math.min(MAZE_WORLD.xmin, rx - pad);
+    var xmax = Math.max(MAZE_WORLD.xmax, rx + pad);
+    var ymin = Math.min(MAZE_WORLD.ymin, ry - pad);
+    var ymax = Math.max(MAZE_WORLD.ymax, ry + pad);
+    var cx = (xmin + xmax) * 0.5;
+    var cy = (ymin + ymax) * 0.5;
+    var span = Math.max(xmax - xmin, ymax - ymin, 4.2);
+    WORLD.xmin = Math.max(MAZE_WORLD.xmin - 0.3, cx - span * 0.5);
+    WORLD.xmax = Math.min(MAZE_WORLD.xmax + 0.3, cx + span * 0.5);
+    WORLD.ymin = Math.max(MAZE_WORLD.ymin - 0.3, cy - span * 0.5);
+    WORLD.ymax = Math.min(MAZE_WORLD.ymax + 0.3, cy + span * 0.5);
+  }
+  var TRAIL_MAX = 120;
+  var SCAN_N = 24;
+  var D_MAX = 3.5;
+
+  function logWS(t) {
+    var el = document.getElementById('ws-log');
+    var ts = new Date().toTimeString().slice(0, 8);
+    el.textContent = '[' + ts + '] ' + t + '\n' + el.textContent.slice(0, 700);
+  }
+
+  if (SECURE) {
+    logWS('HTTPS v3: ' + API + '/lidar_live (no WebSocket).');
+    fetch(API + '/eval_status', { cache: 'no-store' })
+      .then(function (r) {
+        logWS(r.ok ? 'API /eval_status OK.' : 'API /eval_status HTTP ' + r.status);
+      })
+      .catch(function () {
+        logWS('API unreachable — check SIM upload_server :5001 + /ros/api proxy.');
+      });
+  }
+
+  var layout = { ox: 0, oy: 0, s: 0, w: 0, h: 0, dpr: 1 };
+
+  function syncLayout() {
+    var dpr = Math.min(window.devicePixelRatio || 1, 2);
+    var w = Math.max(120, Math.floor(vp.clientWidth));
+    var h = Math.max(120, Math.floor(vp.clientHeight));
+    layout.dpr = dpr;
+    layout.w = w;
+    layout.h = h;
+    arena.width = Math.floor(w * dpr);
+    arena.height = Math.floor(h * dpr);
+    arena.style.width = w + 'px';
+    arena.style.height = h + 'px';
+    actx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    var pad = 32;
+    layout.s = Math.min(w, h) - pad * 2;
+    layout.ox = (w - layout.s) / 2;
+    layout.oy = (h - layout.s) / 2;
+  }
+
+  function wx(x) {
+    return layout.ox + ((x - WORLD.xmin) / (WORLD.xmax - WORLD.xmin)) * layout.s;
+  }
+  function wy(y) {
+    return layout.oy + (1 - (y - WORLD.ymin) / (WORLD.ymax - WORLD.ymin)) * layout.s;
+  }
+
+  function drawWorld() {
+    var L = layout;
+    actx.fillStyle = '#050912';
+    actx.fillRect(0, 0, L.w, L.h);
+
+    actx.strokeStyle = '#004488';
+    actx.lineWidth = 2;
+    actx.strokeRect(L.ox, L.oy, L.s, L.s);
+
+    actx.strokeStyle = '#0a2844';
+    actx.lineWidth = 1;
+    var i, t;
+    for (i = 1; i < 10; i++) {
+      t = i / 10;
+      actx.beginPath();
+      actx.moveTo(L.ox + t * L.s, L.oy);
+      actx.lineTo(L.ox + t * L.s, L.oy + L.s);
+      actx.stroke();
+      actx.beginPath();
+      actx.moveTo(L.ox, L.oy + t * L.s);
+      actx.lineTo(L.ox + L.s, L.oy + t * L.s);
+      actx.stroke();
+    }
+
+    VIEW.obstacles.forEach(function (obs) {
+      if (obs.t === 'c') {
+        var cx = wx(obs.x), cy = wy(obs.y);
+        var r = (obs.r / 10) * L.s;
+        actx.fillStyle = 'rgba(204,68,0,0.4)';
+        actx.beginPath();
+        actx.arc(cx, cy, r, 0, Math.PI * 2);
+        actx.fill();
+        actx.strokeStyle = '#ff7733';
+        actx.lineWidth = 2;
+        actx.stroke();
+      } else {
+        var x1 = wx(obs.x - obs.w / 2);
+        var x2 = wx(obs.x + obs.w / 2);
+        var yTop = wy(obs.y + obs.h / 2);
+        var yBot = wy(obs.y - obs.h / 2);
+        var rx = Math.min(x1, x2);
+        var ry = Math.min(yTop, yBot);
+        var rw = Math.abs(x2 - x1);
+        var rh = Math.abs(yBot - yTop);
+        actx.fillStyle = 'rgba(204,68,0,0.4)';
+        actx.fillRect(rx, ry, rw, rh);
+        actx.strokeStyle = '#ff7733';
+        actx.lineWidth = 2;
+        actx.strokeRect(rx, ry, rw, rh);
+      }
+    });
+
+    if (VIEW.waypoints && VIEW.waypoints.length) {
+      VIEW.waypoints.forEach(function (wp, idx) {
+        var wxp = wx(wp.x), wyp = wy(wp.y);
+        var active = idx === VIEW.wp_idx;
+        actx.fillStyle = active ? 'rgba(0,255,136,0.35)' : 'rgba(255,200,0,0.28)';
+        actx.beginPath();
+        actx.arc(wxp, wyp, active ? 11 : 9, 0, Math.PI * 2);
+        actx.fill();
+        actx.strokeStyle = active ? '#00ff88' : '#ffcc00';
+        actx.lineWidth = 2;
+        actx.stroke();
+        actx.fillStyle = '#0a1020';
+        actx.font = 'bold 11px monospace';
+        actx.textAlign = 'center';
+        actx.textBaseline = 'middle';
+        actx.fillText(String(wp.n != null ? wp.n : idx + 1), wxp, wyp);
+      });
+    }
+
+    var gx = wx(VIEW.goal.x), gy = wy(VIEW.goal.y);
+    var pr = 10 + Math.sin(VIEW.pulse) * 3;
+    VIEW.pulse += 0.08;
+    actx.fillStyle = 'rgba(0,255,136,0.18)';
+    actx.beginPath();
+    actx.arc(gx, gy, pr + 6, 0, Math.PI * 2);
+    actx.fill();
+    actx.strokeStyle = '#00ff88';
+    actx.lineWidth = 2;
+    actx.beginPath();
+    actx.arc(gx, gy, 8, 0, Math.PI * 2);
+    actx.stroke();
+
+    var rx = VIEW.rx, ry = VIEW.ry;
+    var rcx = wx(rx), rcy = wy(ry);
+
+    if (VIEW.scan && VIEW.scan.length) {
+      for (i = 0; i < VIEW.scan.length; i++) {
+        var ang = VIEW.yaw + i * 2 * Math.PI / VIEW.scan.length;
+        var dist = VIEW.scan[i];
+        var ex = rx + Math.cos(ang) * dist;
+        var ey = ry + Math.sin(ang) * dist;
+        var alpha = 0.05 + (1 - dist / D_MAX) * 0.35;
+        actx.strokeStyle = 'rgba(0,180,255,' + alpha + ')';
+        actx.lineWidth = 1;
+        actx.beginPath();
+        actx.moveTo(rcx, rcy);
+        actx.lineTo(wx(ex), wy(ey));
+        actx.stroke();
+      }
+    }
+
+    if (VIEW.trail.length > 1) {
+      actx.beginPath();
+      actx.moveTo(wx(VIEW.trail[0].x), wy(VIEW.trail[0].y));
+      for (i = 1; i < VIEW.trail.length; i++) {
+        actx.lineTo(wx(VIEW.trail[i].x), wy(VIEW.trail[i].y));
+      }
+      actx.strokeStyle = 'rgba(0,136,200,0.45)';
+      actx.lineWidth = 2;
+      actx.stroke();
+    }
+
+    actx.fillStyle = VIEW.lastHit ? '#ff6666' : '#00d4ff';
+    actx.shadowColor = VIEW.lastHit ? '#ff0000' : '#00fff2';
+    actx.shadowBlur = 16;
+    actx.beginPath();
+    actx.arc(rcx, rcy, 9, 0, Math.PI * 2);
+    actx.fill();
+    actx.shadowBlur = 0;
+
+    actx.strokeStyle = '#ffffff';
+    actx.lineWidth = 2;
+    actx.beginPath();
+    actx.moveTo(rcx, rcy);
+    actx.lineTo(rcx + Math.cos(VIEW.yaw) * 22, rcy - Math.sin(VIEW.yaw) * 22);
+    actx.stroke();
+  }
+
+  function loop() {
+    requestAnimationFrame(loop);
+    drawWorld();
+  }
+
+  function onResize() {
+    syncLayout();
+    drawChart();
+  }
+  window.addEventListener('resize', onResize);
+  if (window.ResizeObserver) new ResizeObserver(onResize).observe(vp);
+  window.addEventListener('load', onResize);
+  onResize();
+  loop();
+
+  /* ─── reward chart ─── */
+  var epRewards = [];
+  var successes = 0;
+
+  function drawChart() {
+    var c = document.getElementById('rchart');
+    if (!c) return;
+    var ctx = c.getContext('2d');
+    if (!ctx) return;
+    var W = c.width, H = c.height;
+    if (W < 4 || H < 4) return;
+    ctx.clearRect(0, 0, W, H);
+    if (!epRewards.length) return;
+    var mn = Math.min.apply(null, epRewards);
+    var mx = Math.max.apply(null, epRewards);
+    var span = mx - mn || 1;
+    ctx.strokeStyle = 'rgba(26,42,64,.8)';
+    for (var i = 0; i <= 4; i++) {
+      var y = H - (i / 4) * H;
+      ctx.beginPath();
+      ctx.moveTo(0, y);
+      ctx.lineTo(W, y);
+      ctx.stroke();
+    }
+    var zy = H - ((0 - mn) / span) * H;
+    ctx.strokeStyle = 'rgba(0,212,255,.25)';
+    ctx.beginPath();
+    ctx.moveTo(0, zy);
+    ctx.lineTo(W, zy);
+    ctx.stroke();
+    var pts = epRewards.map(function (r, j) {
+      return {
+        x: (j / Math.max(epRewards.length - 1, 1)) * W,
+        y: H - ((r - mn) / span) * (H - 4) - 2
+      };
+    });
+    ctx.beginPath();
+    ctx.moveTo(pts[0].x, H);
+    pts.forEach(function (p) { ctx.lineTo(p.x, p.y); });
+    ctx.lineTo(pts[pts.length - 1].x, H);
+    ctx.closePath();
+    ctx.fillStyle = 'rgba(0,212,255,.08)';
+    ctx.fill();
+    ctx.beginPath();
+    ctx.strokeStyle = '#00d4ff';
+    ctx.lineWidth = 2;
+    pts.forEach(function (p, j) {
+      if (j === 0) ctx.moveTo(p.x, p.y); else ctx.lineTo(p.x, p.y);
+    });
+    ctx.stroke();
+    pts.forEach(function (p) {
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, 3, 0, Math.PI * 2);
+      ctx.fillStyle = '#00d4ff';
+      ctx.fill();
+    });
+  }
+
+  function onEpisodeEnd(e) {
+    epRewards.push(e.rew);
+    if (e.ok) successes++;
+    var sr = ((successes / e.ep) * 100).toFixed(0);
+    document.getElementById('m-sr').textContent = sr + '%';
+    document.getElementById('m-sr').className = 'mv' + (successes === e.ep ? ' ok' : '');
+
+    var as = document.getElementById('adapt-score');
+    as.textContent = e.adapt.toFixed(0) + '%';
+    as.className = e.adapt < 25 ? '' : e.adapt < 60 ? 'mid' : 'bad';
+
+    document.getElementById('adapt-sub').textContent = e.ok
+      ? ('Episode ' + e.ep + ' — goal in ' + e.steps + ' steps')
+      : ('Episode ' + e.ep + ' — failed after ' + e.steps + ' steps');
+    drawChart();
+  }
+
+  function setRchartSize() {
+    var rc = document.getElementById('rchart');
+    var pw = rc.parentElement ? rc.parentElement.clientWidth : 200;
+    rc.width = Math.max(40, Math.floor(pw - 28));
+    rc.height = 90;
+    drawChart();
+  }
+  window.addEventListener('load', setRchartSize);
+  window.addEventListener('resize', setRchartSize);
+
+  /* ─── WebSocket ─── */
+  var wsLog = document.getElementById('ws-log');
+  var wsPill = document.getElementById('ws-pill');
+  var wsText = document.getElementById('ws-text');
+  var envLbl = document.getElementById('env-label');
+  var ws = null;
+
+  function applyLidarSnap(snap) {
+    if (!snap || !snap.ok) return;
+    if (snap.ep == null) snap.ep = snap.episode != null ? snap.episode : 0;
+    if (snap.step == null) snap.step = 0;
+    if (snap.rew == null && snap.reward != null) snap.rew = snap.reward;
+    if (snap.tot == null && snap.total_reward != null) snap.tot = snap.total_reward;
+    if (!snap.scan && snap.scan24) snap.scan = snap.scan24;
+    if (!snap.t) snap.t = 's';
+    if (snap.waypoints && snap.waypoints.length) {
+      VIEW.waypoints = snap.waypoints;
+      VIEW.wp_idx = snap.wp_idx != null ? snap.wp_idx : 0;
+      var wp = snap.waypoints[VIEW.wp_idx] || snap.waypoints[0];
+      if (wp) VIEW.goal = { x: wp.x, y: wp.y };
+      if (snap.obstacles) VIEW.obstacles = snap.obstacles;
+      if (snap.env_name) envLbl.textContent = 'Environment: ' + snap.env_name;
+    }
+    fitWorldToRobot(snap.x, snap.y);
+    handleMessage(JSON.stringify(snap));
+    var adapt = document.getElementById('adapt-score');
+    if (adapt) {
+      var wpN = (snap.waypoints && snap.waypoints.length) ? snap.waypoints.length : 3;
+      var wpI = (snap.wp_idx != null ? snap.wp_idx : 0) + 1;
+      if (snap.step > 0) {
+        adapt.textContent = 'WP ' + wpI + '/' + wpN + ' · step ' + snap.step;
+        adapt.className = 'ok';
+      } else if (snap.x != null) {
+        adapt.textContent = 'WP ' + wpI + '/' + wpN + ' · step 0';
+        adapt.className = 'mid';
+      }
+    }
+    var mEp = document.getElementById('m-ep');
+    var mRew = document.getElementById('m-rew');
+    var mTot = document.getElementById('m-tot');
+    if (mEp) mEp.textContent = snap.ep;
+    if (mRew) mRew.textContent = Number(snap.rew || 0).toFixed(2);
+    if (mTot) mTot.textContent = Number(snap.tot || 0).toFixed(1);
+    var en = document.getElementById('ep-num');
+    var sn = document.getElementById('step-num');
+    if (en) en.textContent = snap.ep;
+    if (sn) sn.textContent = snap.step;
+  }
+  window.__applyLidarSnap = applyLidarSnap;
+
+  function handleMessage(data) {
+    var msg;
+    try { msg = JSON.parse(data); } catch (e) { return; }
+    if (msg.t === 'env') {
+      VIEW.obstacles = msg.obs || [];
+      VIEW.goal = { x: msg.goal.x, y: msg.goal.y };
+      VIEW.trail = [];
+      envLbl.textContent = 'Environment: ' + (msg.env_name || '');
+    } else if (msg.t === 's') {
+      VIEW.rx = msg.x;
+      VIEW.ry = msg.y;
+      VIEW.yaw = msg.yaw;
+      VIEW.scan = msg.scan;
+      VIEW.lastHit = !!msg.hit;
+      VIEW.lastOk = !!msg.ok;
+      VIEW.trail.push({ x: msg.x, y: msg.y });
+      if (VIEW.trail.length > TRAIL_MAX) VIEW.trail.shift();
+
+      document.getElementById('ep-num').textContent = (msg.ep != null ? msg.ep : 0);
+      document.getElementById('step-num').textContent = (msg.step != null ? msg.step : 0);
+      document.getElementById('m-ep').textContent = (msg.ep != null ? msg.ep : 0);
+      document.getElementById('m-rew').textContent = Number(msg.rew || 0).toFixed(2);
+      document.getElementById('m-tot').textContent = Number(msg.tot || 0).toFixed(1);
+    } else if (msg.t === 'e') {
+      onEpisodeEnd(msg);
+    } else if (msg.t === 'd') {
+      showSummary(msg.summary);
+    } else if (msg.t === 'log') {
+      logWS(msg.msg);
+    }
+  }
+
+  var httpLive = false;
+
+  function setLinkLive(live) {
+    if (live) {
+      wsPill.classList.add('on');
+      wsText.textContent = 'LIVE';
+    } else if (!httpLive) {
+      wsPill.classList.remove('on');
+      wsText.textContent = 'OFFLINE';
+    }
+  }
+
+  function pollLiveHttp() {
+    if (ws && ws.readyState === WebSocket.OPEN) return;
+    apiFetch(API + '/lidar_live', { cache: 'no-store' })
+      .then(function (r) { return r.ok ? r.json() : null; })
+      .then(function (snap) {
+        if (!snap || !snap.ok) {
+          httpLive = false;
+          setLinkLive(false);
+          return;
+        }
+        var ageSec = (Date.now() / 1000) - (snap.updated_at || 0);
+        if (ageSec > 30) {
+          httpLive = false;
+          setLinkLive(false);
+          return;
+        }
+        httpLive = true;
+        applyLidarSnap(snap);
+        setLinkLive(true);
+        var st = document.getElementById('upload-status');
+        if (st && snap.step > 0) {
+          st.textContent = 'Live step ' + snap.step + ' · rew ' + Number(snap.rew || 0).toFixed(2);
+          st.className = 'upload-status ok';
+        }
+        if (!window.__lidarOkLogged) {
+          window.__lidarOkLogged = true;
+          logWS('HTTP lidar_live OK (age ' + ageSec.toFixed(1) + 's).');
+        }
+      })
+      .catch(function () {
+        httpLive = false;
+        logWS('HTTP lidar_live failed — run start_sim_demo_remote.sh on simulation host');
+      });
+  }
+
+  function connect() {
+    if (ws && (ws.readyState === WebSocket.CONNECTING || ws.readyState === WebSocket.OPEN)) return;
+    logWS('Connecting ' + WS_URL + ' …');
+    try {
+      ws = new WebSocket(WS_URL);
+    } catch (e) {
+      logWS('WebSocket error: ' + e.message);
+      setTimeout(connect, 3000);
+      return;
+    }
+    ws.onopen = function () {
+      setLinkLive(true);
+      logWS('Connected (WebSocket).');
+    };
+    ws.onclose = function (ev) {
+      var why = ev && typeof ev.code === 'number'
+        ? (' code ' + ev.code + (ev.reason ? ' ' + String(ev.reason).slice(0, 80) : ''))
+        : '';
+      logWS('WebSocket down' + why + ' — HTTP fallback');
+      setTimeout(connect, 3000);
+      pollLiveHttp();
+    };
+    ws.onerror = function () {
+      logWS('WebSocket error — HTTP fallback');
+    };
+    ws.onmessage = function (ev) {
+      handleMessage(ev.data);
+    };
+  }
+
+  setInterval(pollLiveHttp, 300);
+  pollLiveHttp();
+  if (!SECURE) {
+    connect();
+  } else {
+    logWS('HTTPS: live via HTTP /lidar_live (WebSocket disabled).');
+  }
+
+  document.addEventListener('visibilitychange', function () {
+    if (document.hidden) return;
+    if (!SECURE) {
+      if (ws && (ws.readyState === WebSocket.OPEN || ws.readyState === WebSocket.CONNECTING)) return;
+      connect();
+    }
+    pollLiveHttp();
+  });
+  window.addEventListener('online', function () {
+    if (!SECURE && ws && ws.readyState === WebSocket.OPEN) return;
+    if (!SECURE) connect();
+    pollLiveHttp();
+  });
+
+  document.querySelectorAll('.env-btn').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      document.querySelectorAll('.env-btn').forEach(function (b) { b.classList.remove('active'); });
+      btn.classList.add('active');
+      epRewards = [];
+      successes = 0;
+      document.getElementById('adapt-score').textContent = '—';
+      document.getElementById('adapt-score').className = '';
+      drawChart();
+      if (ws && ws.readyState === WebSocket.OPEN) {
+        ws.send(JSON.stringify({ type: 'change_env', env: parseInt(btn.getAttribute('data-env'), 10) }));
+      }
+    });
+  });
+
+  document.getElementById('apply-ep-btn').addEventListener('click', function () {
+    var n = parseInt(document.getElementById('ep-input').value, 10) || 10;
+    epRewards = [];
+    successes = 0;
+    drawChart();
+    if (ws && ws.readyState === WebSocket.OPEN) {
+      ws.send(JSON.stringify({ type: 'set_episodes', n: n }));
+    }
+  });
+
+  /* ─── upload ─── */
+  var fileIn = document.getElementById('model-file');
+  var fdrop = document.getElementById('fdrop');
+  var fname = document.getElementById('fname');
+  var algoSel = document.getElementById('algo-sel');
+  var upBtn = document.getElementById('upload-btn');
+  var canBtn = document.getElementById('cancel-btn');
+  var econ = document.getElementById('econsole');
+  var ebadge = document.getElementById('eval-badge');
+  var esum = document.getElementById('eval-summary');
+  var sumsGrid = document.getElementById('sums-grid');
+  var evtSrc = null;
+
+  fileIn.addEventListener('change', function () {
+    if (fileIn.files.length) {
+      fname.textContent = fileIn.files[0].name;
+      upBtn.disabled = false;
+    }
+  });
+  fdrop.addEventListener('dragover', function (e) { e.preventDefault(); fdrop.classList.add('over'); });
+  fdrop.addEventListener('dragleave', function () { fdrop.classList.remove('over'); });
+  fdrop.addEventListener('drop', function (e) {
+    e.preventDefault();
+    fdrop.classList.remove('over');
+    var f = e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0];
+    if (f && f.name.slice(-4).toLowerCase() === '.pth') {
+      var dt = new DataTransfer();
+      dt.items.add(f);
+      fileIn.files = dt.files;
+      fname.textContent = f.name;
+      upBtn.disabled = false;
+    }
+  });
+
+  function elog(text, cls) {
+    var d = document.createElement('div');
+    if (cls) d.className = cls;
+    d.textContent = text;
+    econ.appendChild(d);
+    econ.scrollTop = econ.scrollHeight;
+  }
+  function setBadge(state, txt) {
+    ebadge.className = 'vis ' + state;
+    ebadge.textContent = txt;
+  }
+
+  /* upload: standalone ros-live-v6 script */
+
+  function openStream() {
+    if (evtSrc) { evtSrc.close(); evtSrc = null; }
+    try {
+      evtSrc = new EventSource(API + '/eval_stream');
+    } catch (e) {
+      elog('EventSource failed: ' + e.message, 'err');
+      return;
+    }
+    evtSrc.onmessage = function (e) {
+      var line = JSON.parse(e.data);
+      var cls = /\[ERROR\]|Error/i.test(line) ? 'err'
+        : /SOLVED|saved/i.test(line) ? 'ok'
+        : /upload_server|\[model\]/i.test(line) ? 'inf' : '';
+      elog(line, cls);
+      var m = /\[Eval\s+(\d+)\/(\d+)\].*reward=([\d.-]+)/.exec(line);
+      if (m) {
+        document.getElementById('m-ep').textContent = m[1];
+        document.getElementById('m-rew').textContent = Number(m[3]).toFixed(2);
+        document.getElementById('ep-num').textContent = m[1];
+      }
+    };
+    evtSrc.addEventListener('done', function (e) {
+      evtSrc.close();
+      evtSrc = null;
+      var snap = JSON.parse(e.data);
+      setBadge(snap.status === 'done' ? 'done' : 'err', snap.status === 'done' ? '✓ Done' : '✗ ' + snap.status);
+      canBtn.style.display = 'none';
+      upBtn.disabled = false;
+      if (snap.status === 'done') fetchResults();
+    });
+    evtSrc.onerror = function () {
+      elog('[stream] lost', 'err');
+    };
+  }
+
+  canBtn.addEventListener('click', function () {
+    fetch(API + '/eval_cancel', { method: 'POST' }).then(function () {
+      elog('Cancel sent.', 'inf');
+    }).catch(function () {
+      elog('Cancel failed.', 'err');
+    });
+  });
+
+  function fetchResults() {
+    fetch(API + '/eval_results')
+      .then(function (r) { return r.ok ? r.json() : null; })
+      .then(function (d) {
+        if (!d || !d.summary) return;
+        var s = d.summary;
+        sumsGrid.innerHTML = '';
+        var rows = [
+          ['Success rate', (s.success_rate * 100).toFixed(1) + ' %'],
+          ['Episodes', s.episodes_solved + ' / ' + s.episodes_total],
+          ['Mean reward', String(s.mean_reward)],
+          ['± Std', String(s.std_reward)],
+          ['WP cleared', (s.mean_waypoints != null ? s.mean_waypoints : 0).toFixed(2)]
+        ];
+        rows.forEach(function (row) {
+          var el = document.createElement('div');
+          el.className = 'sum-item';
+          el.innerHTML = '<label>' + row[0] + '</label><div class="sv">' + row[1] + '</div>';
+          sumsGrid.appendChild(el);
+        });
+        esum.classList.add('vis');
+      })
+      .catch(function () {});
+  }
+
+  function showSummary(s) {
+    if (!s) return;
+    sumsGrid.innerHTML = '';
+    var rows = [
+      ['Success rate', (s.success_rate * 100).toFixed(1) + ' %'],
+      ['Solved', s.episodes_solved + ' / ' + s.episodes_total],
+      ['Mean reward', String(s.mean_reward)],
+      ['± Std', String(s.std_reward)]
+    ];
+    rows.forEach(function (row) {
+      var el = document.createElement('div');
+      el.className = 'sum-item';
+      el.innerHTML = '<label>' + row[0] + '</label><div class="sv">' + row[1] + '</div>';
+      sumsGrid.appendChild(el);
+    });
+    esum.classList.add('vis');
+  }
+
+  fetch(API + '/eval_status')
+    .then(function (r) { return r.json(); })
+    .then(function (d) {
+      if (d.status === 'running') {
+        econ.classList.add('vis');
+        setBadge('run', '⟳ Running');
+        canBtn.style.display = 'inline-block';
+        upBtn.disabled = true;
+        (d.tail || []).forEach(function (l) { elog(l); });
+        openStream();
+      }
+    })
+    .catch(function () {});
+
+  logWS('UI ready (Canvas 2D). No WebGL / no external JS libraries.');
+})();
+</script>
+<script src="/ros/ros_live_canvas.js?v=4"></script>
+<script defer src="https://static.cloudflareinsights.com/beacon.min.js/v833ccba57c9e4d2798f2e76cebdd09a11778172276447" integrity="sha512-57MDmcccJXYtNnH+ZiBwzC4jb2rvgVCEokYN+L/nLlmO8rfYT/gIpW2A569iJ/3b+0UEasghjuZH/ma3wIs/EQ==" data-cf-beacon='{"version":"2024.11.0","token":"69e0b6ea70ac4119b1043416b4ecb75f","r":1,"server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
+<script defer src="https://static.cloudflareinsights.com/beacon.min.js/v833ccba57c9e4d2798f2e76cebdd09a11778172276447" integrity="sha512-57MDmcccJXYtNnH+ZiBwzC4jb2rvgVCEokYN+L/nLlmO8rfYT/gIpW2A569iJ/3b+0UEasghjuZH/ma3wIs/EQ==" data-cf-beacon='{"version":"2024.11.0","token":"69e0b6ea70ac4119b1043416b4ecb75f","r":1,"server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
+</body>
+</html>

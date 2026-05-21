@@ -1,0 +1,175 @@
+{
+  "algo": "sac",
+  "model_path": "/home/anon/ros2_ws/src/safe_drl_nav/safe_drl_nav/trained_models/sac_actor_maze.pth",
+  "timestamp": "2026-05-11T07:12:52Z",
+  "waypoints": [
+    [
+      -2.8,
+      -1.8
+    ],
+    [
+      -4.5,
+      -0.2
+    ],
+    [
+      -3.2,
+      1.2
+    ]
+  ],
+  "episodes": [
+    {
+      "episode": 1,
+      "reward": -77.26,
+      "steps": 416,
+      "waypoints_cleared": 0,
+      "solved": false
+    },
+    {
+      "episode": 2,
+      "reward": -32.137,
+      "steps": 411,
+      "waypoints_cleared": 0,
+      "solved": false
+    },
+    {
+      "episode": 3,
+      "reward": -25.573,
+      "steps": 260,
+      "waypoints_cleared": 0,
+      "solved": false
+    },
+    {
+      "episode": 4,
+      "reward": -26.449,
+      "steps": 265,
+      "waypoints_cleared": 0,
+      "solved": false
+    },
+    {
+      "episode": 5,
+      "reward": -25.966,
+      "steps": 265,
+      "waypoints_cleared": 0,
+      "solved": false
+    },
+    {
+      "episode": 6,
+      "reward": -70.531,
+      "steps": 362,
+      "waypoints_cleared": 0,
+      "solved": false
+    },
+    {
+      "episode": 7,
+      "reward": -35.746,
+      "steps": 489,
+      "waypoints_cleared": 0,
+      "solved": false
+    },
+    {
+      "episode": 8,
+      "reward": -32.257,
+      "steps": 425,
+      "waypoints_cleared": 0,
+      "solved": false
+    },
+    {
+      "episode": 9,
+      "reward": -48.262,
+      "steps": 290,
+      "waypoints_cleared": 0,
+      "solved": false
+    },
+    {
+      "episode": 10,
+      "reward": -26.036,
+      "steps": 263,
+      "waypoints_cleared": 0,
+      "solved": false
+    },
+    {
+      "episode": 11,
+      "reward": -25.965,
+      "steps": 255,
+      "waypoints_cleared": 0,
+      "solved": false
+    },
+    {
+      "episode": 12,
+      "reward": -25.319,
+      "steps": 274,
+      "waypoints_cleared": 0,
+      "solved": false
+    },
+    {
+      "episode": 13,
+      "reward": -32.049,
+      "steps": 417,
+      "waypoints_cleared": 0,
+      "solved": false
+    },
+    {
+      "episode": 14,
+      "reward": -25.929,
+      "steps": 268,
+      "waypoints_cleared": 0,
+      "solved": false
+    },
+    {
+      "episode": 15,
+      "reward": -54.242,
+      "steps": 535,
+      "waypoints_cleared": 0,
+      "solved": false
+    },
+    {
+      "episode": 16,
+      "reward": -39.115,
+      "steps": 336,
+      "waypoints_cleared": 0,
+      "solved": false
+    },
+    {
+      "episode": 17,
+      "reward": -46.168,
+      "steps": 304,
+      "waypoints_cleared": 0,
+      "solved": false
+    },
+    {
+      "episode": 18,
+      "reward": -23.072,
+      "steps": 210,
+      "waypoints_cleared": 0,
+      "solved": false
+    },
+    {
+      "episode": 19,
+      "reward": -37.993,
+      "steps": 231,
+      "waypoints_cleared": 0,
+      "solved": false
+    },
+    {
+      "episode": 20,
+      "reward": -26.411,
+      "steps": 255,
+      "waypoints_cleared": 0,
+      "solved": false
+    }
+  ],
+  "summary": {
+    "episodes_total": 20,
+    "episodes_solved": 0,
+    "success_rate": 0.0,
+    "mean_reward": -36.824,
+    "std_reward": 15.002,
+    "min_reward": -77.26,
+    "max_reward": -23.072,
+    "mean_waypoints": 0.0,
+    "std_waypoints": 0.0,
+    "mean_steps": 326.6,
+    "std_steps": 89.8,
+    "total_waypoints_possible": 3
+  }
+}

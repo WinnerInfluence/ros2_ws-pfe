@@ -1,0 +1,89 @@
+<?xml version="1.0"?>
+<sdf version="1.6">
+  <!-- style: pillar_forest | mu1=0.660 mu2=0.362 -->
+  <world name="randomized_training_world">
+
+    <physics type="ode">
+      <max_step_size>0.01</max_step_size>
+      <real_time_factor>1</real_time_factor>
+      <real_time_update_rate>100</real_time_update_rate>
+    </physics>
+
+    <include><uri>model://sun</uri></include>
+
+    
+    <model name="custom_ground">
+      <static>true</static>
+      <link name="link">
+        <collision name="collision">
+          <geometry><plane><normal>0 0 1</normal><size>20 20</size></plane></geometry>
+          <surface><friction><ode><mu>0.66</mu><mu2>0.362</mu2></ode></friction></surface>
+        </collision>
+        <visual name="visual">
+          <geometry><plane><normal>0 0 1</normal><size>20 20</size></plane></geometry>
+          <material><script><uri>file://media/materials/scripts/gazebo.material</uri><name>Gazebo/Grey</name></script></material>
+        </visual>
+      </link>
+    </model>
+
+    
+    <model name="boundary_north"><static>true</static><pose>0 5 0.5 0 0 0</pose><link name="link"><collision name="c"><geometry><box><size>10 0.2 1.0</size></box></geometry></collision><visual name="v"><geometry><box><size>10 0.2 1.0</size></box></geometry><material><script><uri>file://media/materials/scripts/gazebo.material</uri><name>Gazebo/DarkGrey</name></script></material></visual></link></model>
+
+    <model name="boundary_south"><static>true</static><pose>0 -5 0.5 0 0 0</pose><link name="link"><collision name="c"><geometry><box><size>10 0.2 1.0</size></box></geometry></collision><visual name="v"><geometry><box><size>10 0.2 1.0</size></box></geometry><material><script><uri>file://media/materials/scripts/gazebo.material</uri><name>Gazebo/DarkGrey</name></script></material></visual></link></model>
+
+    <model name="boundary_east"><static>true</static><pose>5 0 0.5 0 0 0</pose><link name="link"><collision name="c"><geometry><box><size>0.2 10 1.0</size></box></geometry></collision><visual name="v"><geometry><box><size>0.2 10 1.0</size></box></geometry><material><script><uri>file://media/materials/scripts/gazebo.material</uri><name>Gazebo/DarkGrey</name></script></material></visual></link></model>
+
+    <model name="boundary_west"><static>true</static><pose>-5 0 0.5 0 0 0</pose><link name="link"><collision name="c"><geometry><box><size>0.2 10 1.0</size></box></geometry></collision><visual name="v"><geometry><box><size>0.2 10 1.0</size></box></geometry><material><script><uri>file://media/materials/scripts/gazebo.material</uri><name>Gazebo/DarkGrey</name></script></material></visual></link></model>
+
+    
+    <model name="pillar_0"><static>true</static><pose>-1.0 -4.0 0.5858036382755083 0 0 0</pose><link name="link"><collision name="c"><geometry><cylinder><radius>0.2334094090253095</radius><length>1.1716072765510166</length></cylinder></geometry></collision><visual name="v"><geometry><cylinder><radius>0.2334094090253095</radius><length>1.1716072765510166</length></cylinder></geometry><material><script><uri>file://media/materials/scripts/gazebo.material</uri><name>Gazebo/DarkGrey</name></script></material></visual></link></model>
+
+    <model name="pillar_1"><static>true</static><pose>-1.0 -2.5 1.0557196417620216 0 0 0</pose><link name="link"><collision name="c"><geometry><cylinder><radius>0.3156426558541446</radius><length>2.111439283524043</length></cylinder></geometry></collision><visual name="v"><geometry><cylinder><radius>0.3156426558541446</radius><length>2.111439283524043</length></cylinder></geometry><material><script><uri>file://media/materials/scripts/gazebo.material</uri><name>Gazebo/Grey</name></script></material></visual></link></model>
+
+    <model name="pillar_2"><static>true</static><pose>0.5 -2.5 0.7820684715081281 0 0 0</pose><link name="link"><collision name="c"><geometry><cylinder><radius>0.2686240386446622</radius><length>1.5641369430162562</length></cylinder></geometry></collision><visual name="v"><geometry><cylinder><radius>0.2686240386446622</radius><length>1.5641369430162562</length></cylinder></geometry><material><script><uri>file://media/materials/scripts/gazebo.material</uri><name>Gazebo/Grey</name></script></material></visual></link></model>
+
+    <model name="pillar_3"><static>true</static><pose>2.0 -2.5 0.6999343113931639 0 0 0</pose><link name="link"><collision name="c"><geometry><cylinder><radius>0.2242623442083551</radius><length>1.3998686227863277</length></cylinder></geometry></collision><visual name="v"><geometry><cylinder><radius>0.2242623442083551</radius><length>1.3998686227863277</length></cylinder></geometry><material><script><uri>file://media/materials/scripts/gazebo.material</uri><name>Gazebo/White</name></script></material></visual></link></model>
+
+    <model name="pillar_4"><static>true</static><pose>3.5 -2.5 0.6350476915261263 0 0 0</pose><link name="link"><collision name="c"><geometry><cylinder><radius>0.2802589570443689</radius><length>1.2700953830522526</length></cylinder></geometry></collision><visual name="v"><geometry><cylinder><radius>0.2802589570443689</radius><length>1.2700953830522526</length></cylinder></geometry><material><script><uri>file://media/materials/scripts/gazebo.material</uri><name>Gazebo/White</name></script></material></visual></link></model>
+
+    <model name="pillar_5"><static>true</static><pose>-3.5 -1.0 0.6493471854924396 0 0 0</pose><link name="link"><collision name="c"><geometry><cylinder><radius>0.3481441542415089</radius><length>1.2986943709848793</length></cylinder></geometry></collision><visual name="v"><geometry><cylinder><radius>0.3481441542415089</radius><length>1.2986943709848793</length></cylinder></geometry><material><script><uri>file://media/materials/scripts/gazebo.material</uri><name>Gazebo/DarkGrey</name></script></material></visual></link></model>
+
+    <model name="pillar_6"><static>true</static><pose>-1.0 -1.0 0.7819548980888402 0 0 0</pose><link name="link"><collision name="c"><geometry><cylinder><radius>0.27239250595745274</radius><length>1.5639097961776804</length></cylinder></geometry></collision><visual name="v"><geometry><cylinder><radius>0.27239250595745274</radius><length>1.5639097961776804</length></cylinder></geometry><material><script><uri>file://media/materials/scripts/gazebo.material</uri><name>Gazebo/White</name></script></material></visual></link></model>
+
+    <model name="pillar_7"><static>true</static><pose>0.5 -1.0 0.7712062651851423 0 0 0</pose><link name="link"><collision name="c"><geometry><cylinder><radius>0.20622616162789928</radius><length>1.5424125303702847</length></cylinder></geometry></collision><visual name="v"><geometry><cylinder><radius>0.20622616162789928</radius><length>1.5424125303702847</length></cylinder></geometry><material><script><uri>file://media/materials/scripts/gazebo.material</uri><name>Gazebo/White</name></script></material></visual></link></model>
+
+    <model name="pillar_8"><static>true</static><pose>0.5 0.5 0.442707599971634 0 0 0</pose><link name="link"><collision name="c"><geometry><cylinder><radius>0.18477342563322333</radius><length>0.885415199943268</length></cylinder></geometry></collision><visual name="v"><geometry><cylinder><radius>0.18477342563322333</radius><length>0.885415199943268</length></cylinder></geometry><material><script><uri>file://media/materials/scripts/gazebo.material</uri><name>Gazebo/DarkGrey</name></script></material></visual></link></model>
+
+    <model name="pillar_9"><static>true</static><pose>2.0 0.5 0.46480554840450106 0 0 0</pose><link name="link"><collision name="c"><geometry><cylinder><radius>0.3350169447508352</radius><length>0.9296110968090021</length></cylinder></geometry></collision><visual name="v"><geometry><cylinder><radius>0.3350169447508352</radius><length>0.9296110968090021</length></cylinder></geometry><material><script><uri>file://media/materials/scripts/gazebo.material</uri><name>Gazebo/White</name></script></material></visual></link></model>
+
+    <model name="pillar_10"><static>true</static><pose>3.5 0.5 1.1026529946055144 0 0 0</pose><link name="link"><collision name="c"><geometry><cylinder><radius>0.3472631080031108</radius><length>2.2053059892110287</length></cylinder></geometry></collision><visual name="v"><geometry><cylinder><radius>0.3472631080031108</radius><length>2.2053059892110287</length></cylinder></geometry><material><script><uri>file://media/materials/scripts/gazebo.material</uri><name>Gazebo/DarkGrey</name></script></material></visual></link></model>
+
+    <model name="pillar_11"><static>true</static><pose>-4.5 2.0 0.6310857947965502 0 0 0</pose><link name="link"><collision name="c"><geometry><cylinder><radius>0.205090985855528</radius><length>1.2621715895931005</length></cylinder></geometry></collision><visual name="v"><geometry><cylinder><radius>0.205090985855528</radius><length>1.2621715895931005</length></cylinder></geometry><material><script><uri>file://media/materials/scripts/gazebo.material</uri><name>Gazebo/Grey</name></script></material></visual></link></model>
+
+    <model name="pillar_12"><static>true</static><pose>-2.5 2.0 0.5752693606117083 0 0 0</pose><link name="link"><collision name="c"><geometry><cylinder><radius>0.28073797911626086</radius><length>1.1505387212234166</length></cylinder></geometry></collision><visual name="v"><geometry><cylinder><radius>0.28073797911626086</radius><length>1.1505387212234166</length></cylinder></geometry><material><script><uri>file://media/materials/scripts/gazebo.material</uri><name>Gazebo/Grey</name></script></material></visual></link></model>
+
+    <model name="pillar_13"><static>true</static><pose>0.5 2.0 0.8800746875823863 0 0 0</pose><link name="link"><collision name="c"><geometry><cylinder><radius>0.24557453868097912</radius><length>1.7601493751647725</length></cylinder></geometry></collision><visual name="v"><geometry><cylinder><radius>0.24557453868097912</radius><length>1.7601493751647725</length></cylinder></geometry><material><script><uri>file://media/materials/scripts/gazebo.material</uri><name>Gazebo/White</name></script></material></visual></link></model>
+
+    <model name="pillar_14"><static>true</static><pose>2.0 2.0 0.5066184916229544 0 0 0</pose><link name="link"><collision name="c"><geometry><cylinder><radius>0.2338573210146613</radius><length>1.0132369832459087</length></cylinder></geometry></collision><visual name="v"><geometry><cylinder><radius>0.2338573210146613</radius><length>1.0132369832459087</length></cylinder></geometry><material><script><uri>file://media/materials/scripts/gazebo.material</uri><name>Gazebo/White</name></script></material></visual></link></model>
+
+    <model name="pillar_15"><static>true</static><pose>3.5 2.0 0.901056465294665 0 0 0</pose><link name="link"><collision name="c"><geometry><cylinder><radius>0.22298925180440307</radius><length>1.80211293058933</length></cylinder></geometry></collision><visual name="v"><geometry><cylinder><radius>0.22298925180440307</radius><length>1.80211293058933</length></cylinder></geometry><material><script><uri>file://media/materials/scripts/gazebo.material</uri><name>Gazebo/Grey</name></script></material></visual></link></model>
+
+    <model name="pillar_16"><static>true</static><pose>-2.5 3.5 0.5971509939524037 0 0 0</pose><link name="link"><collision name="c"><geometry><cylinder><radius>0.29759322655775317</radius><length>1.1943019879048073</length></cylinder></geometry></collision><visual name="v"><geometry><cylinder><radius>0.29759322655775317</radius><length>1.1943019879048073</length></cylinder></geometry><material><script><uri>file://media/materials/scripts/gazebo.material</uri><name>Gazebo/DarkGrey</name></script></material></visual></link></model>
+
+    <model name="pillar_17"><static>true</static><pose>-1.0 3.5 0.7104772350777575 0 0 0</pose><link name="link"><collision name="c"><geometry><cylinder><radius>0.3459964044737246</radius><length>1.420954470155515</length></cylinder></geometry></collision><visual name="v"><geometry><cylinder><radius>0.3459964044737246</radius><length>1.420954470155515</length></cylinder></geometry><material><script><uri>file://media/materials/scripts/gazebo.material</uri><name>Gazebo/Grey</name></script></material></visual></link></model>
+
+    <model name="pillar_18"><static>true</static><pose>0.5 3.5 1.01076818250141 0 0 0</pose><link name="link"><collision name="c"><geometry><cylinder><radius>0.2504107686743575</radius><length>2.02153636500282</length></cylinder></geometry></collision><visual name="v"><geometry><cylinder><radius>0.2504107686743575</radius><length>2.02153636500282</length></cylinder></geometry><material><script><uri>file://media/materials/scripts/gazebo.material</uri><name>Gazebo/Grey</name></script></material></visual></link></model>
+
+    <model name="pillar_19"><static>true</static><pose>2.0 3.5 0.4354745624028589 0 0 0</pose><link name="link"><collision name="c"><geometry><cylinder><radius>0.23155211611238974</radius><length>0.8709491248057178</length></cylinder></geometry></collision><visual name="v"><geometry><cylinder><radius>0.23155211611238974</radius><length>0.8709491248057178</length></cylinder></geometry><material><script><uri>file://media/materials/scripts/gazebo.material</uri><name>Gazebo/DarkGrey</name></script></material></visual></link></model>
+
+    <model name="pillar_20"><static>true</static><pose>3.5 3.5 0.7420865894566522 0 0 0</pose><link name="link"><collision name="c"><geometry><cylinder><radius>0.2188664037708287</radius><length>1.4841731789133044</length></cylinder></geometry></collision><visual name="v"><geometry><cylinder><radius>0.2188664037708287</radius><length>1.4841731789133044</length></cylinder></geometry><material><script><uri>file://media/materials/scripts/gazebo.material</uri><name>Gazebo/DarkGrey</name></script></material></visual></link></model>
+
+    
+    <model name="wp_marker_1"><static>true</static><pose>-2.8 -1.8 0.5 0 0 0</pose><link name="link"><collision name="c"><geometry><cylinder><radius>0.25</radius><length>1.0</length></cylinder></geometry></collision><visual name="v"><geometry><cylinder><radius>0.25</radius><length>1.0</length></cylinder></geometry><material><script><uri>file://media/materials/scripts/gazebo.material</uri><name>Gazebo/Red</name></script></material></visual></link></model>
+
+    <model name="wp_marker_2"><static>true</static><pose>-4.5 -0.2 0.5 0 0 0</pose><link name="link"><collision name="c"><geometry><cylinder><radius>0.25</radius><length>1.0</length></cylinder></geometry></collision><visual name="v"><geometry><cylinder><radius>0.25</radius><length>1.0</length></cylinder></geometry><material><script><uri>file://media/materials/scripts/gazebo.material</uri><name>Gazebo/Red</name></script></material></visual></link></model>
+
+    <model name="wp_marker_3"><static>true</static><pose>-3.2 1.2 0.5 0 0 0</pose><link name="link"><collision name="c"><geometry><cylinder><radius>0.25</radius><length>1.0</length></cylinder></geometry></collision><visual name="v"><geometry><cylinder><radius>0.25</radius><length>1.0</length></cylinder></geometry><material><script><uri>file://media/materials/scripts/gazebo.material</uri><name>Gazebo/Red</name></script></material></visual></link></model>
+
+  </world>
+</sdf>

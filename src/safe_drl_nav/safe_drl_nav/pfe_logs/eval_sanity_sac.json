@@ -1,0 +1,81 @@
+{
+  "algo": "sac",
+  "model_path": "/home/anon/ros2_ws/src/safe_drl_nav/safe_drl_nav/trained_models/sac_actor_maze_best_ever.pth",
+  "timestamp": "2026-05-15T22:55:26Z",
+  "waypoints": [
+    [
+      -2.8,
+      -1.8
+    ],
+    [
+      -4.5,
+      -0.2
+    ],
+    [
+      -3.2,
+      1.2
+    ]
+  ],
+  "eval_config": {
+    "harness": "SafeNavAgent_step_environment",
+    "max_steps_per_episode": 4000,
+    "env_step_sleep_sec": 0.03,
+    "shield": true,
+    "waypoint_goal_radius_cli": 0.68,
+    "waypoint_clear_radius_m": 0.68,
+    "sac_action": "sample",
+    "td3_policy_noise_std": 0.0,
+    "reset_fire_and_forget": true,
+    "reset_service_wait_sec": 45.0,
+    "pfe_world": "",
+    "paper_eval": false,
+    "require_reset": true,
+    "episodes_run": 3,
+    "training_contract_path": "/home/anon/ros2_ws/src/safe_drl_nav/safe_drl_nav/training_contract.yaml"
+  },
+  "episodes": [
+    {
+      "episode": 1,
+      "reward": 256.868,
+      "steps": 4000,
+      "waypoints_cleared": 2,
+      "solved": false,
+      "shield_active": true
+    },
+    {
+      "episode": 2,
+      "reward": 782.235,
+      "steps": 1410,
+      "waypoints_cleared": 3,
+      "solved": true,
+      "shield_active": true
+    },
+    {
+      "episode": 3,
+      "reward": 848.208,
+      "steps": 1448,
+      "waypoints_cleared": 3,
+      "solved": true,
+      "shield_active": true
+    }
+  ],
+  "summary": {
+    "episodes_total": 3,
+    "episodes_solved": 2,
+    "success_rate": 0.6667,
+    "episodes_reached_at_least_one_wp": 3,
+    "fraction_reached_at_least_one_wp": 1.0,
+    "episodes_on_final_waypoint_leg": 3,
+    "fraction_on_final_waypoint_leg": 1.0,
+    "best_waypoints_cleared_single_episode": 3,
+    "mean_reward": 629.104,
+    "std_reward": 264.585,
+    "min_reward": 256.868,
+    "max_reward": 848.208,
+    "mean_waypoints": 2.667,
+    "std_waypoints": 0.471,
+    "mean_steps": 2286.0,
+    "std_steps": 1212.1,
+    "total_waypoints_possible": 3
+  }
+}

@@ -1,0 +1,49 @@
+{
+  "time_utc": "2026-05-06T03:02:27Z",
+  "hostname": "ProBook",
+  "pid": 128504,
+  "argv": [
+    "main_agent.py",
+    "--algo",
+    "sac"
+  ],
+  "algo": "sac",
+  "git_commit": "unknown",
+  "git_dirty": false,
+  "ros2_ws": "/home/anon/ros2_ws",
+  "args": {
+    "preset": "none",
+    "algo": "sac",
+    "force_restart": false,
+    "max_episode_steps": 4000,
+    "env_step_sleep_sec": 0.1,
+    "use_shield": false,
+    "waypoint_mode": false,
+    "load_pretrained": "",
+    "max_episodes": 10000,
+    "device": "cpu",
+    "randomize_goal": false,
+    "goal_mode": "box",
+    "goal_x_range": [
+      -5.0,
+      -2.0
+    ],
+    "goal_y_range": [
+      -5.0,
+      -2.0
+    ],
+    "goal_sample_attempts": 48,
+    "goal_safe_margin": 1.15,
+    "goal_sector_halfwidth_bins": 2,
+    "train_seed": null,
+    "grad_steps": 1,
+    "world_regen_script": "",
+    "world_regen_interval": 0,
+    "manifest_tag": "",
+    "no_sim_reset": false,
+    "reset_service": "/reset_simulation",
+    "reset_service_wait_sec": 45.0,
+    "reset_reply_wait_sec": 5.0,
+    "reset_fire_and_forget": false
+  }
+}

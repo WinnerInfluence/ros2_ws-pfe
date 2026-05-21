@@ -1,0 +1,54 @@
+{
+  "time_utc": "2026-05-06T05:01:12Z",
+  "hostname": "ProBook",
+  "pid": 139126,
+  "argv": [
+    "main_agent.py",
+    "--preset",
+    "pfe_sac_waypoint",
+    "--load-pretrained",
+    "/home/anon/ros2_ws/src/safe_drl_nav/safe_drl_nav/trained_models/sac_actor_maze.pth",
+    "--reset-fire-and-forget",
+    "--reset-service-wait-sec",
+    "12"
+  ],
+  "algo": "sac",
+  "git_commit": "unknown",
+  "git_dirty": false,
+  "ros2_ws": "/home/anon/ros2_ws",
+  "args": {
+    "preset": "pfe_sac_waypoint",
+    "algo": "sac",
+    "force_restart": false,
+    "max_episode_steps": 4000,
+    "env_step_sleep_sec": 0.05,
+    "use_shield": false,
+    "waypoint_mode": true,
+    "load_pretrained": "/home/anon/ros2_ws/src/safe_drl_nav/safe_drl_nav/trained_models/sac_actor_maze.pth",
+    "max_episodes": 10000,
+    "device": "cpu",
+    "randomize_goal": false,
+    "goal_mode": "box",
+    "goal_x_range": [
+      -5.0,
+      -2.0
+    ],
+    "goal_y_range": [
+      -5.0,
+      -2.0
+    ],
+    "goal_sample_attempts": 48,
+    "goal_safe_margin": 1.15,
+    "goal_sector_halfwidth_bins": 2,
+    "train_seed": null,
+    "grad_steps": 2,
+    "world_regen_script": "",
+    "world_regen_interval": 0,
+    "manifest_tag": "",
+    "no_sim_reset": false,
+    "reset_service": "/reset_simulation",
+    "reset_service_wait_sec": 12.0,
+    "reset_reply_wait_sec": 5.0,
+    "reset_fire_and_forget": true
+  }
+}

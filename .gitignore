@@ -1,0 +1,69 @@
+# ROS 2 build artifacts
+build/
+install/
+log/
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+dist/
+*.egg
+.venv/
+venv/
+
+# IDE / OS
+.idea/
+.vscode/
+.cursor/
+
+# Local editor recovery (not part of the submission)
+agent-transcripts/
+scripts/recover_wiped_files.py
+*.swp
+*~
+.DS_Store
+
+# ROS logs (can fill disk)
+~/.ros/log/
+
+# Large / regenerable training noise (keep key checkpoints — see trained_models/README.md)
+src/safe_drl_nav/safe_drl_nav/pfe_logs/*.log
+src/safe_drl_nav/safe_drl_nav/pfe_logs/auto_train.pid
+src/safe_drl_nav/safe_drl_nav/pfe_logs/tb_*/
+src/safe_drl_nav/safe_drl_nav/trained_models/backups/
+src/safe_drl_nav/safe_drl_nav/trained_models/archive/
+
+# LaTeX build (thesis)
+pfe_report/**/main.pdf
+pfe_report/**/*.aux
+pfe_report/**/*.bbl
+pfe_report/**/*.bcf
+pfe_report/**/*.blg
+pfe_report/**/*.fdb_latexmk
+pfe_report/**/*.fls
+pfe_report/**/*.log
+pfe_report/**/*.out
+pfe_report/**/*.synctex.gz
+pfe_report/**/*.toc
+pfe_report/**/out/
+pfe_report/**/*.zip
+_etoc_test_*
+
+# Nested git inside thesis (use monorepo only)
+pfe_report/thesis_pfe_pro/.git/
+
+# Secrets / local env
+*.pem
+.env
+sim_demo.env
+
+# Workspace runtime logs (never commit live demo / training noise)
+pfe_logs/
+src/safe_drl_nav/safe_drl_nav/pfe_logs/*.json
+src/safe_drl_nav/safe_drl_nav/trained_models/uploaded_brain.pth
+
+# Temp
+/tmp/
+*.bak

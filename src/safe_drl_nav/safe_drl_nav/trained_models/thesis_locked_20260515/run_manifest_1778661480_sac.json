@@ -1,0 +1,209 @@
+{
+  "time_utc": "2026-05-13T08:38:00Z",
+  "hostname": "ProBook",
+  "pid": 102206,
+  "argv": [
+    "main_agent.py",
+    "--preset",
+    "pfe_sac_waypoint",
+    "--load-pretrained",
+    "/home/anon/ros2_ws/src/safe_drl_nav/safe_drl_nav/trained_models/sac_actor_phase2_s7_style3.pth",
+    "--max-episodes",
+    "300",
+    "--reset-fire-and-forget",
+    "--reset-service-wait-sec",
+    "12",
+    "--lr",
+    "1e-4"
+  ],
+  "algo": "sac",
+  "git_commit": "unknown",
+  "git_dirty": false,
+  "ros2_ws": "/home/anon/ros2_ws",
+  "args": {
+    "preset": "pfe_sac_waypoint",
+    "algo": "sac",
+    "force_restart": false,
+    "max_episode_steps": 1500,
+    "env_step_sleep_sec": 0.05,
+    "use_shield": true,
+    "waypoint_mode": true,
+    "load_pretrained": "/home/anon/ros2_ws/src/safe_drl_nav/safe_drl_nav/trained_models/sac_actor_phase2_s7_style3.pth",
+    "max_episodes": 300,
+    "lr": 0.0001,
+    "device": "cpu",
+    "randomize_goal": false,
+    "goal_mode": "box",
+    "goal_x_range": [
+      -5.0,
+      -2.0
+    ],
+    "goal_y_range": [
+      -5.0,
+      -2.0
+    ],
+    "goal_sample_attempts": 48,
+    "goal_safe_margin": 1.15,
+    "goal_sector_halfwidth_bins": 2,
+    "train_seed": null,
+    "grad_steps": 1,
+    "world_regen_script": "sim_assets/scripts/randomize_world.py",
+    "world_regen_interval": 50,
+    "adaptive_steps": true,
+    "adaptive_base_steps": 600,
+    "adaptive_step_inc": 300,
+    "manifest_tag": "",
+    "no_sim_reset": false,
+    "reset_service": "/reset_simulation",
+    "reset_service_wait_sec": 12.0,
+    "reset_reply_wait_sec": 5.0,
+    "reset_fire_and_forget": true,
+    "training_contract": ""
+  },
+  "torch_version": "2.10.0+cpu",
+  "numpy_version": "1.21.5",
+  "training_contract_bundle": {
+    "training_contract_path": "/home/anon/ros2_ws/src/safe_drl_nav/safe_drl_nav/training_contract.yaml",
+    "training_contract_sha256": "e994c74df0f4f89f2ce1249f9f692369eac6107efb1ce60cd3be8db5a6e951ea",
+    "training_contract_version": 1,
+    "training_contract_name": "safe_drl_nav_mdp_v1",
+    "frozen_contract_snapshot": {
+      "contract_version": 1,
+      "contract_name": "safe_drl_nav_mdp_v1",
+      "runtime": {
+        "ros_distro_expected": "humble",
+        "gazebo_stack_note": "ROS 2 Humble + gazebo_ros (classic gzserver/gzclient)",
+        "python_torch_note": "Train/infer with same torch major.minor when possible"
+      },
+      "observation": {
+        "lidar_bins": 36,
+        "goal_channels": 2,
+        "state_dim": 38,
+        "dtype_storage": "float32",
+        "layout": [
+          "scan[0:lidar_bins]: min-pooled LaserScan ranges, each divided by msg.range_max (per-step)",
+          "goal_xy: (target_x - robot_x), (target_y - robot_y) in world frame meters"
+        ],
+        "lidar_pooling": "min_pool_uniform_ray_bins",
+        "lidar_invalid_ray_handling": "clamp_below_range_min_to_range_max_then_finite_check"
+      },
+      "action": {
+        "policy_output_space": "tanh_box",
+        "policy_output_low": [
+          -1.0,
+          -1.0
+        ],
+        "policy_output_high": [
+          1.0,
+          1.0
+        ],
+        "stored_in_replay": "applied_cmd_after_scaling",
+        "linear_velocity_m_s": {
+          "formula": "clip((tanh_out_0 + 1.0) * 0.2, 0.0, 0.4)",
+          "comment": "affine map so entire [-1,1] maps to forward-only [0, 0.4]"
+        },
+        "angular_velocity_unit": {
+          "formula": "clip(tanh_out_1, -1.0, 1.0)",
+          "ros_mapping": "Twist.angular.z (rad/s scale depends on TurtleBot3 controller)"
+        }
+      },
+      "ros_topics": {
+        "cmd_vel": "/cmd_vel",
+        "scan": "/scan",
+        "odom": "/odom",
+        "reset_service": "/reset_simulation",
+        "scan_qos": "sensor_data",
+        "odom_qos": "default_depth_10"
+      },
+      "mdp": {
+        "distance_multiplier": 20.0,
+        "step_penalty": 0.01,
+        "goal_radius_m": 0.5,
+        "single_goal_reward": 100.0,
+        "waypoint_reward": 80.0,
+        "final_waypoint_reward": 300.0,
+        "collision_terminal_penalty": 15.0,
+        "shield_critical_range_m": 0.35,
+        "shield_step_penalty": 0.3,
+        "shield_backup_lin": 0.12,
+        "shield_turn_ang": 0.9,
+        "use_shield_default": false,
+        "proximity_reward_scale": 2.0,
+        "proximity_threshold_m": 1.5
+      },
+      "waypoints": {
+        "maze_waypoints_xy": [
+          [
+            -2.8,
+            -1.8
+          ],
+          [
+            -4.5,
+            -0.2
+          ],
+          [
+            -3.2,
+            1.2
+          ]
+        ],
+        "spawn_nominal_xy": [
+          -2.0,
+          -2.0
+        ]
+      },
+      "training_defaults": {
+        "replay_warmup_steps": 5000,
+        "replay_batch_size": 256,
+        "replay_capacity": 100000,
+        "grad_steps_default": 1,
+        "max_episode_steps_default": 4000,
+        "env_step_sleep_sec_default": 0.1
+      },
+      "networks": {
+        "implementation": "custom_torch_not_sb3",
+        "sac": {
+          "actor_class": "safe_drl_nav.networks_sac.ActorNetwork",
+          "critic_class": "safe_drl_nav.networks_sac.CriticNetwork",
+          "trainer_class": "safe_drl_nav.trainer_sac.SACTrainer",
+          "hidden_dim": 256,
+          "activation": "silu_layernorm",
+          "entropy": "auto_alpha_target_minus_action_dim"
+        },
+        "td3": {
+          "actor_class": "safe_drl_nav.networks_td3.ActorNetwork",
+          "critic_class": "safe_drl_nav.networks_td3.CriticNetwork",
+          "trainer_class": "safe_drl_nav.trainer_td3.TD3Trainer",
+          "hidden_dim": 256,
+          "activation": "silu_layernorm",
+          "policy_delay": 2
+        },
+        "checkpoint_actor_keys_note": "torch.save(actor.state_dict()) \u2014 actor weights ONLY"
+      },
+      "worlds": {
+        "training_world_dir_relative": "sim_assets/worlds",
+        "training_default_basename": "current_random_lab.world"
+      },
+      "termination": {
+        "episode_done_when": [
+          "single_goal_mode: distance_to_goal < goal_radius_m",
+          "waypoint_mode: last waypoint cleared (same radius)",
+          "collision_unshielded: front_hemisphere_min_range < shield_critical_range_m (when use_shield false)",
+          "max_episode_steps reached (implicit timeout \u2014 done flag from loop not env)"
+        ]
+      }
+    },
+    "network_source_fingerprint": {
+      "sac_hidden": 256,
+      "td3_hidden": 256
+    },
+    "world_files_sha256": {
+      "current_random_lab.world": "d00c0daf49dada270f21fba92a891559b0494828717e78788b6454c7e7b6e6fe"
+    },
+    "checkpoint_format": {
+      "saved_as": "torch.save(actor.state_dict(), path)",
+      "payload": "Actor network state_dict ONLY (no critic, optimizer, alpha)",
+      "inference_load": "actor.load_state_dict(torch.load(path)); actor.eval()",
+      "full_resume_note": "Replay buffer not checkpointed \u2014 cold replay on resume"
+    }
+  }
+}

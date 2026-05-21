@@ -1,0 +1,5 @@
+# Pin training stack for local runs and AWS replay (install in your venv / container).
+# PyTorch: pick CPU or CUDA wheel from https://pytorch.org — do not duplicate here.
+numpy>=1.23.5,<2.2
+tensorboard>=2.14.0
+torch>=2.1.0

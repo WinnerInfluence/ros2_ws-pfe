@@ -1,0 +1,1118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ROS2 Robot — Live Game</title>
+  <style>
+    /* ------------------------------------------------------------------ reset */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    /* ------------------------------------------------------------------ theme */
+    :root {
+      --bg:       #0d1117;
+      --surface:  #161b22;
+      --border:   #30363d;
+      --accent:   #58a6ff;
+      --green:    #3fb950;
+      --red:      #f85149;
+      --yellow:   #d29922;
+      --text:     #e6edf3;
+      --muted:    #8b949e;
+      --radius:   10px;
+      --navy:     #1e3a5f;
+      --teal:     #2d8a8a;
+      --gold:     #c9a227;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px 16px 40px;
+      gap: 18px;
+    }
+
+    /* ------------------------------------------------------------------ header */
+    header {
+      width: 100%;
+      max-width: 860px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    h1 { font-size: 1.4rem; letter-spacing: .5px; color: var(--accent); }
+    h1 span { color: var(--text); font-weight: 400; }
+
+    #status-pill {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 14px;
+      border-radius: 20px;
+      border: 1px solid var(--border);
+      font-size: .85rem;
+      font-weight: 600;
+      letter-spacing: .4px;
+      transition: border-color .3s, color .3s;
+      color: var(--red);
+      border-color: var(--red);
+    }
+    #status-pill.online  { color: var(--green); border-color: var(--green); }
+    #status-pill .dot {
+      width: 9px; height: 9px;
+      border-radius: 50%;
+      background: currentColor;
+      animation: none;
+    }
+    #status-pill.online .dot { animation: pulse 1.4s ease-in-out infinite; }
+    @keyframes pulse {
+      0%,100% { opacity: 1; } 50% { opacity: .35; }
+    }
+
+    /* ------------------------------------------------------------------ academic banner (PFE / thesis branding) */
+    .academic-banner {
+      width: 100%;
+      max-width: 860px;
+      background: linear-gradient(135deg, rgba(30,58,95,.55) 0%, var(--surface) 48%, rgba(45,138,138,.22) 100%);
+      border: 1px solid var(--border);
+      border-top: 3px solid var(--teal);
+      border-radius: var(--radius);
+      padding: 14px 18px 16px;
+      box-shadow: 0 4px 24px rgba(0,0,0,.25);
+    }
+    .academic-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .academic-logo {
+      height: 52px;
+      width: auto;
+      max-width: 120px;
+      object-fit: contain;
+      filter: drop-shadow(0 1px 2px rgba(0,0,0,.4));
+    }
+    .academic-center {
+      flex: 1;
+      min-width: 200px;
+      text-align: center;
+      padding: 0 8px;
+    }
+    .academic-uni {
+      font-size: .72rem;
+      font-weight: 700;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      color: var(--teal);
+      line-height: 1.35;
+    }
+    .academic-uni-sub {
+      font-size: .68rem;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+    .academic-pfe {
+      margin-top: 8px;
+      font-size: .78rem;
+      color: var(--text);
+      line-height: 1.4;
+      font-weight: 500;
+    }
+    .academic-year {
+      display: inline-block;
+      margin-top: 6px;
+      padding: 3px 10px;
+      border-radius: 999px;
+      font-size: .68rem;
+      font-weight: 700;
+      letter-spacing: .08em;
+      color: var(--gold);
+      border: 1px solid rgba(201,162,39,.45);
+      background: rgba(201,162,39,.08);
+    }
+    .academic-meta {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px 16px;
+      margin-top: 14px;
+      padding-top: 12px;
+      border-top: 1px solid var(--border);
+    }
+    @media (max-width: 520px) {
+      .academic-meta { grid-template-columns: 1fr; }
+      .academic-logo { height: 44px; max-width: 96px; }
+    }
+    .academic-meta-block label {
+      display: block;
+      font-size: .62rem;
+      text-transform: uppercase;
+      letter-spacing: .1em;
+      color: var(--muted);
+      margin-bottom: 3px;
+    }
+    .academic-meta-block .name {
+      font-size: .88rem;
+      font-weight: 700;
+      color: var(--text);
+      line-height: 1.3;
+    }
+    .academic-meta-block .name-sm {
+      font-size: .82rem;
+      font-weight: 600;
+      color: var(--accent);
+      line-height: 1.35;
+    }
+    .academic-meta-block.right { text-align: right; }
+
+    /* ------------------------------------------------------------------ grid */
+    .grid {
+      width: 100%;
+      max-width: 860px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+    @media (max-width: 600px) { .grid { grid-template-columns: 1fr; } }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px;
+    }
+    .card h2 {
+      font-size: .75rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--muted);
+      margin-bottom: 12px;
+    }
+
+    /* ------------------------------------------------------------------ radar */
+    #radar-wrap { grid-column: 1 / -1; display: flex; justify-content: center; }
+    #radar-canvas {
+      width: 280px;
+      height: 280px;
+      border-radius: 50%;
+      background: #0a0f16;
+      border: 1px solid var(--border);
+    }
+
+    /* ------------------------------------------------------------------ telemetry */
+    .tel-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+    .tel-item label {
+      display: block;
+      font-size: .7rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: .8px;
+      margin-bottom: 4px;
+    }
+    .tel-item .val {
+      font-size: 1.25rem;
+      font-weight: 700;
+      font-variant-numeric: tabular-nums;
+      color: var(--accent);
+    }
+
+    /* ------------------------------------------------------------------ controls */
+    #controls-card { grid-column: 1 / -1; }
+
+    .dpad {
+      display: grid;
+      grid-template-columns: repeat(3, 64px);
+      grid-template-rows: repeat(3, 64px);
+      gap: 6px;
+      justify-content: center;
+    }
+
+    .dpad-btn {
+      background: #1c2530;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text);
+      font-size: 1.4rem;
+      cursor: pointer;
+      transition: background .1s, transform .1s, border-color .1s;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .dpad-btn:active, .dpad-btn.pressed {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #0d1117;
+      transform: scale(.93);
+    }
+    .dpad-btn.stop-btn {
+      background: #2a1a1a;
+      border-color: #5a2020;
+      font-size: .7rem;
+      font-weight: 700;
+      letter-spacing: .5px;
+      color: var(--red);
+    }
+    .dpad-btn.stop-btn:active, .dpad-btn.stop-btn.pressed {
+      background: var(--red);
+      color: #fff;
+      border-color: var(--red);
+    }
+
+    /* grid slot helpers */
+    .btn-fwd  { grid-column: 2; grid-row: 1; }
+    .btn-left { grid-column: 1; grid-row: 2; }
+    .btn-stop { grid-column: 2; grid-row: 2; }
+    .btn-right{ grid-column: 3; grid-row: 2; }
+    .btn-back { grid-column: 2; grid-row: 3; }
+
+    .hint {
+      margin-top: 12px;
+      text-align: center;
+      font-size: .75rem;
+      color: var(--muted);
+    }
+
+    /* ------------------------------------------------------------------ speed slider */
+    .speed-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-top: 14px;
+      flex-wrap: wrap;
+    }
+    .speed-row label { font-size: .78rem; color: var(--muted); white-space: nowrap; }
+    #speed-slider { flex: 1; min-width: 100px; accent-color: var(--accent); }
+    #speed-val { font-size: .85rem; color: var(--accent); min-width: 38px; text-align: right; }
+
+    /* ------------------------------------------------------------------ log */
+    #log {
+      width: 100%;
+      max-width: 860px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 10px 14px;
+      font-size: .75rem;
+      color: var(--muted);
+      font-family: 'Consolas', monospace;
+      max-height: 90px;
+      overflow-y: auto;
+    }
+
+    /* ------------------------------------------------------------------ upload card */
+    #upload-card { grid-column: 1 / -1; }
+
+    .upload-form {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: flex-end;
+    }
+
+    .upload-form label {
+      font-size: .7rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: .8px;
+      display: block;
+      margin-bottom: 5px;
+    }
+
+    .upload-form select,
+    .upload-form input[type="number"] {
+      background: #0d1117;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      color: var(--text);
+      padding: 7px 10px;
+      font-size: .85rem;
+      width: 100%;
+    }
+    .upload-form select:focus,
+    .upload-form input[type="number"]:focus {
+      outline: none;
+      border-color: var(--accent);
+    }
+
+    .form-field { flex: 1; min-width: 100px; max-width: 160px; }
+    .form-field-file { flex: 2; min-width: 200px; }
+
+    .file-drop {
+      border: 2px dashed var(--border);
+      border-radius: 8px;
+      padding: 14px 16px;
+      text-align: center;
+      cursor: pointer;
+      transition: border-color .2s, background .2s;
+      font-size: .82rem;
+      color: var(--muted);
+      position: relative;
+    }
+    .file-drop:hover, .file-drop.drag-over {
+      border-color: var(--accent);
+      background: rgba(88,166,255,.06);
+      color: var(--accent);
+    }
+    .file-drop input[type="file"] {
+      position: absolute; inset: 0; opacity: 0; cursor: pointer;
+    }
+    #file-name {
+      margin-top: 4px;
+      font-size: .72rem;
+      color: var(--accent);
+      min-height: 14px;
+      text-align: center;
+    }
+
+    .upload-btn {
+      background: var(--accent);
+      color: #0d1117;
+      border: none;
+      border-radius: 8px;
+      padding: 10px 22px;
+      font-size: .88rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: opacity .15s, transform .1s;
+      white-space: nowrap;
+      align-self: flex-end;
+    }
+    .upload-btn:hover { opacity: .88; }
+    .upload-btn:active { transform: scale(.96); }
+    .upload-btn:disabled { opacity: .4; cursor: not-allowed; transform: none; }
+
+    .cancel-btn {
+      background: transparent;
+      color: var(--red);
+      border: 1px solid var(--red);
+      border-radius: 8px;
+      padding: 9px 16px;
+      font-size: .82rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background .15s;
+      white-space: nowrap;
+      align-self: flex-end;
+    }
+    .cancel-btn:hover { background: rgba(248,81,73,.1); }
+
+    /* eval output console */
+    #eval-console {
+      margin-top: 14px;
+      background: #0a0f16;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 10px 12px;
+      font-family: 'Consolas', monospace;
+      font-size: .73rem;
+      color: #8b949e;
+      max-height: 160px;
+      overflow-y: auto;
+      display: none;
+    }
+    #eval-console.visible { display: block; }
+    #eval-console .line-ok   { color: #3fb950; }
+    #eval-console .line-err  { color: #f85149; }
+    #eval-console .line-info { color: #58a6ff; }
+
+    /* result summary table */
+    #eval-summary {
+      margin-top: 12px;
+      display: none;
+    }
+    #eval-summary.visible { display: block; }
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+      gap: 8px;
+      margin-top: 8px;
+    }
+    .summary-item {
+      background: #0a0f16;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 10px 12px;
+    }
+    .summary-item label {
+      font-size: .65rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: .8px;
+      display: block;
+      margin-bottom: 4px;
+    }
+    .summary-item .sval {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--green);
+      font-variant-numeric: tabular-nums;
+    }
+
+    /* status badge inside upload card */
+    #eval-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: .75rem;
+      font-weight: 600;
+      padding: 3px 10px;
+      border-radius: 12px;
+      margin-left: 10px;
+      vertical-align: middle;
+      border: 1px solid transparent;
+      display: none;
+    }
+    #eval-badge.running  { color: var(--yellow); border-color: var(--yellow); }
+    #eval-badge.done     { color: var(--green);  border-color: var(--green);  }
+    #eval-badge.error    { color: var(--red);    border-color: var(--red);    }
+    #eval-badge.visible  { display: inline-flex; }
+    .chk-row {
+      font-size: .76rem;
+      font-weight: 400;
+      text-transform: none;
+      letter-spacing: 0;
+      color: var(--text);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-basis: 100%;
+      padding-top: 4px;
+      user-select: none;
+    }
+    .chk-row input { accent-color: var(--accent); width: auto; vertical-align: middle; }
+  </style>
+</head>
+<body>
+
+<!-- ============================================================ ACADEMIC BANNER -->
+<section class="academic-banner" aria-label="University and thesis information">
+  <div class="academic-top">
+    <img class="academic-logo" src="demo_assets/uae.png" alt="Université Abdelmalek Essaâdi" width="120" height="52" />
+    <div class="academic-center">
+      <div class="academic-uni">Université Abdelmalek Essaâdi</div>
+      <div class="academic-uni-sub">FST Al Hoceima — MST Embedded Systems &amp; Robotics (SER)</div>
+      <div class="academic-pfe">PFE demo · Safe DRL navigation · ROS&nbsp;2 / Gazebo digital twin</div>
+      <span class="academic-year">Academic year 2025/2026</span>
+    </div>
+    <img class="academic-logo" src="demo_assets/fsth.png" alt="Faculté des Sciences et Techniques — Al Hoceima" width="120" height="52" />
+  </div>
+  <div class="academic-meta">
+    <div class="academic-meta-block">
+      <label>Author</label>
+      <div class="name">RABEH Houssam Eddine</div>
+    </div>
+    <div class="academic-meta-block right">
+      <label>Supervisors</label>
+      <div class="name-sm">Pr. Nabil El Akchioui</div>
+      <div class="name-sm">Pr. Walid Jebrane</div>
+    </div>
+  </div>
+</section>
+<script>
+  (function () {
+    var base = (location.pathname.indexOf('/ros') === 0) ? '/ros/demo_assets/' : 'demo_assets/';
+    document.querySelectorAll('.academic-logo').forEach(function (img) {
+      var f = (img.getAttribute('src') || '').split('/').pop();
+      if (f) img.src = base + f;
+    });
+  })();
+</script>
+
+<!-- ============================================================ HEADER -->
+<header>
+  <h1>Robot <span>Live Game</span></h1>
+  <div id="status-pill">
+    <span class="dot"></span>
+    <span id="status-text">OFFLINE</span>
+  </div>
+</header>
+
+<!-- ============================================================ MAIN GRID -->
+<div class="grid">
+
+  <!-- radar -->
+  <div class="card" id="radar-wrap">
+    <h2>LiDAR Radar</h2>
+    <canvas id="radar-canvas" width="280" height="280"></canvas>
+  </div>
+
+  <!-- telemetry -->
+  <div class="card">
+    <h2>Position</h2>
+    <div class="tel-grid">
+      <div class="tel-item"><label>X (m)</label><div class="val" id="tel-x">—</div></div>
+      <div class="tel-item"><label>Y (m)</label><div class="val" id="tel-y">—</div></div>
+      <div class="tel-item"><label>Heading (°)</label><div class="val" id="tel-yaw">—</div></div>
+      <div class="tel-item"><label>Lin vel (m/s)</label><div class="val" id="tel-lv">—</div></div>
+    </div>
+  </div>
+
+  <!-- live cmd feedback -->
+  <div class="card">
+    <h2>Command Sent</h2>
+    <div class="tel-grid">
+      <div class="tel-item"><label>linear.x</label><div class="val" id="cmd-lx">0.00</div></div>
+      <div class="tel-item"><label>angular.z</label><div class="val" id="cmd-az">0.00</div></div>
+    </div>
+  </div>
+
+  <!-- d-pad controls -->
+  <div class="card" id="controls-card">
+    <h2>Manual Drive  <small style="font-weight:400;text-transform:none;letter-spacing:0">(keys: W A S D / arrows)</small></h2>
+    <div class="dpad">
+      <button class="dpad-btn btn-fwd"   id="btn-fwd"  >▲</button>
+      <button class="dpad-btn btn-left"  id="btn-left" >◀</button>
+      <button class="dpad-btn btn-stop stop-btn" id="btn-stop">STOP</button>
+      <button class="dpad-btn btn-right" id="btn-right">▶</button>
+      <button class="dpad-btn btn-back"  id="btn-back" >▼</button>
+    </div>
+    <div class="speed-row">
+      <label>Speed</label>
+      <input type="range" id="speed-slider" min="0.05" max="0.5" step="0.05" value="0.20" />
+      <span id="speed-val">0.20 m/s</span>
+    </div>
+    <p class="hint">Hold a button or key to keep driving · Release to stop</p>
+  </div>
+
+  <!-- ============================================================ MODEL UPLOAD -->
+  <div class="card" id="upload-card">
+    <h2>
+      Model Upload
+      <span id="eval-badge"></span>
+    </h2>
+
+    <div class="upload-form">
+
+      <div class="form-field-file">
+        <label>Weights file (.pth)</label>
+        <div class="file-drop" id="file-drop">
+          <input type="file" id="model-file" accept=".pth" />
+          Drop .pth here or click to browse
+        </div>
+        <div id="file-name"></div>
+      </div>
+
+      <div class="form-field">
+        <label>Algorithm</label>
+        <select id="algo-select">
+          <option value="sac"    selected>SAC</option>
+          <option value="td3">TD3</option>
+          <option value="custom">Custom</option>
+        </select>
+      </div>
+
+      <div class="form-field">
+        <label>Episodes</label>
+        <input type="number" id="episodes-input" value="5" min="1" max="100" />
+      </div>
+
+      <label class="chk-row" for="spawn-eval-chk">
+        <input type="checkbox" id="spawn-eval-chk" checked />
+        Run standalone evaluate_agent (metrics JSON + live log)
+      </label>
+      <label class="chk-row" for="paper-eval-chk">
+        <input type="checkbox" id="paper-eval-chk" />
+        Paper eval (≥30 ep, strict reset)
+      </label>
+      <p class="hint" style="flex-basis:100%;margin-top:0;text-align:left;font-size:.72rem">
+        Uncheck when <code>hot_swap_eval</code> is running: upload only saves weights and publishes <code>/policy_reload</code>.
+      </p>
+
+      <button class="upload-btn" id="upload-btn" disabled>Upload &amp; Eval</button>
+      <button class="cancel-btn" id="cancel-btn" style="display:none">Cancel</button>
+
+    </div>
+
+    <!-- live console output -->
+    <div id="eval-console"></div>
+
+    <!-- result summary -->
+    <div id="eval-summary">
+      <h2 style="margin-top:12px">Last Eval Results</h2>
+      <div class="summary-grid" id="summary-grid"></div>
+    </div>
+
+  </div>
+
+</div><!-- .grid -->
+
+<!-- ============================================================ LOG -->
+<div id="log">Waiting for connection…</div>
+
+<!-- ============================================================ SCRIPT -->
+<script>
+(function () {
+  'use strict';
+
+  /* ---------------------------------------------------------------- config */
+  function _apiBase() {
+    if (window.SIM_DEMO_API_BASE) return window.SIM_DEMO_API_BASE.replace(/\/$/, '');
+    const p = location.pathname || '';
+    if (p.indexOf('/ros') === 0) return location.origin + '/ros/api';
+    return location.protocol + '//' + location.hostname + ':5001';
+  }
+  function _wsUrl() {
+    if (window.SIM_DEMO_WS_URL) return window.SIM_DEMO_WS_URL;
+    const p = location.pathname || '';
+    if (p.indexOf('/ros') === 0) {
+      return (location.protocol === 'https:' ? 'wss:' : 'ws:') + '//' + location.host + '/ros/ws';
+    }
+    return (location.protocol === 'https:' ? 'wss:' : 'ws:') + '//' + location.hostname + ':9090';
+  }
+  const WS_URL  = _wsUrl();
+  const RECONNECT_DELAY_MS = 2000;
+
+  /* ---------------------------------------------------------------- state  */
+  let ws         = null;
+  let connected  = false;
+  let pressedKey = null;   // currently held drive direction
+  let repeatTimer = null;
+
+  const speedSlider = document.getElementById('speed-slider');
+  const speedVal    = document.getElementById('speed-val');
+
+  function getSpeed() { return parseFloat(speedSlider.value); }
+
+  speedSlider.addEventListener('input', () => {
+    speedVal.textContent = parseFloat(speedSlider.value).toFixed(2) + ' m/s';
+  });
+
+  /* ---------------------------------------------------------------- logging */
+  const logEl = document.getElementById('log');
+  function log(msg) {
+    const ts = new Date().toTimeString().slice(0, 8);
+    logEl.textContent = `[${ts}] ${msg}\n` + logEl.textContent.slice(0, 800);
+  }
+
+  /* ---------------------------------------------------------------- status pill */
+  const pill   = document.getElementById('status-pill');
+  const stText = document.getElementById('status-text');
+  function setStatus(online) {
+    connected = online;
+    pill.classList.toggle('online', online);
+    stText.textContent = online ? 'ONLINE' : 'OFFLINE';
+  }
+
+  /* ---------------------------------------------------------------- WebSocket */
+  function connect() {
+    log(`Connecting to ${WS_URL} …`);
+    try { ws = new WebSocket(WS_URL); } catch (e) { scheduleReconnect(); return; }
+
+    ws.onopen  = () => { setStatus(true);  log('Connected to bridge.'); };
+    ws.onclose = () => { setStatus(false); log('Disconnected — retrying…'); scheduleReconnect(); };
+    ws.onerror = () => { log('WebSocket error.'); };
+
+    ws.onmessage = ({ data }) => {
+      let msg;
+      try { msg = JSON.parse(data); } catch { return; }
+      if (msg.type === 'scan') handleScan(msg);
+      else if (msg.type === 'odom') handleOdom(msg);
+    };
+  }
+
+  function scheduleReconnect() {
+    setTimeout(connect, RECONNECT_DELAY_MS);
+  }
+
+  function send(obj) {
+    if (ws && ws.readyState === WebSocket.OPEN) ws.send(JSON.stringify(obj));
+  }
+
+  /* ---------------------------------------------------------------- telemetry */
+  function handleOdom(d) {
+    document.getElementById('tel-x').textContent   = d.x.toFixed(2);
+    document.getElementById('tel-y').textContent   = d.y.toFixed(2);
+    document.getElementById('tel-yaw').textContent = d.yaw_deg.toFixed(1) + '°';
+    document.getElementById('tel-lv').textContent  = d.lin_vel.toFixed(3);
+  }
+
+  /* ---------------------------------------------------------------- radar    */
+  const radarCanvas = document.getElementById('radar-canvas');
+  const ctx = radarCanvas.getContext('2d');
+  const CX = 140, CY = 140, R = 126;
+
+  function handleScan(d) {
+    const { bins, range_max } = d;
+    const n = bins.length;
+    ctx.clearRect(0, 0, 280, 280);
+
+    // rings
+    ctx.strokeStyle = '#1e2d3d';
+    ctx.lineWidth = 1;
+    [.25, .5, .75, 1.0].forEach(f => {
+      ctx.beginPath();
+      ctx.arc(CX, CY, R * f, 0, Math.PI * 2);
+      ctx.stroke();
+    });
+    // crosshairs
+    ctx.beginPath();
+    ctx.moveTo(CX - R, CY); ctx.lineTo(CX + R, CY);
+    ctx.moveTo(CX, CY - R); ctx.lineTo(CX, CY + R);
+    ctx.stroke();
+
+    // obstacle sweep
+    ctx.beginPath();
+    for (let i = 0; i < n; i++) {
+      const angle = (i / n) * Math.PI * 2 - Math.PI / 2; // 0 = top (forward)
+      const dist  = Math.min(bins[i], range_max) / range_max;
+      const rx = CX + Math.cos(angle) * dist * R;
+      const ry = CY + Math.sin(angle) * dist * R;
+      if (i === 0) ctx.moveTo(rx, ry); else ctx.lineTo(rx, ry);
+    }
+    ctx.closePath();
+    ctx.fillStyle   = 'rgba(88,166,255,.18)';
+    ctx.strokeStyle = '#58a6ff';
+    ctx.lineWidth   = 1.5;
+    ctx.fill();
+    ctx.stroke();
+
+    // obstacle dots
+    ctx.fillStyle = '#f85149';
+    for (let i = 0; i < n; i++) {
+      if (bins[i] >= range_max * .98) continue;
+      const angle = (i / n) * Math.PI * 2 - Math.PI / 2;
+      const dist  = bins[i] / range_max;
+      ctx.beginPath();
+      ctx.arc(CX + Math.cos(angle) * dist * R, CY + Math.sin(angle) * dist * R, 3, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    // robot dot
+    ctx.fillStyle = '#3fb950';
+    ctx.beginPath();
+    ctx.arc(CX, CY, 5, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = '#0d1117';
+    ctx.beginPath();
+    ctx.arc(CX, CY, 2, 0, Math.PI * 2);
+    ctx.fill();
+  }
+
+  /* ---------------------------------------------------------------- drive commands */
+  const CMDS = {
+    fwd:   () => ({ type: 'cmd_vel', linear_x:  getSpeed(), angular_z:  0.0  }),
+    back:  () => ({ type: 'cmd_vel', linear_x: -getSpeed(), angular_z:  0.0  }),
+    left:  () => ({ type: 'cmd_vel', linear_x:  0.0,        angular_z:  getSpeed() * 2.5 }),
+    right: () => ({ type: 'cmd_vel', linear_x:  0.0,        angular_z: -getSpeed() * 2.5 }),
+    stop:  () => ({ type: 'stop' }),
+  };
+
+  function sendDrive(dir) {
+    const cmd = CMDS[dir]();
+    send(cmd);
+    document.getElementById('cmd-lx').textContent = (cmd.linear_x  ?? 0).toFixed(2);
+    document.getElementById('cmd-az').textContent = (cmd.angular_z ?? 0).toFixed(2);
+  }
+
+  function startDrive(dir) {
+    if (pressedKey === dir) return;
+    stopDrive();
+    pressedKey = dir;
+    sendDrive(dir);
+    if (dir !== 'stop') {
+      repeatTimer = setInterval(() => sendDrive(dir), 100);
+    }
+  }
+
+  function stopDrive() {
+    if (repeatTimer) { clearInterval(repeatTimer); repeatTimer = null; }
+    pressedKey = null;
+    sendDrive('stop');
+  }
+
+  /* ---------------------------------------------------------------- button events */
+  const btnMap = {
+    'btn-fwd':   'fwd',
+    'btn-back':  'back',
+    'btn-left':  'left',
+    'btn-right': 'right',
+    'btn-stop':  'stop',
+  };
+
+  Object.entries(btnMap).forEach(([id, dir]) => {
+    const el = document.getElementById(id);
+    const down = (e) => { e.preventDefault(); el.classList.add('pressed'); startDrive(dir); };
+    const up   = (e) => { e.preventDefault(); el.classList.remove('pressed'); if (dir !== 'stop') stopDrive(); };
+    el.addEventListener('mousedown',  down);
+    el.addEventListener('touchstart', down, { passive: false });
+    el.addEventListener('mouseup',    up);
+    el.addEventListener('touchend',   up);
+    el.addEventListener('mouseleave', up);
+  });
+
+  /* ---------------------------------------------------------------- keyboard */
+  const keyDir = {
+    ArrowUp:    'fwd',  w: 'fwd',
+    ArrowDown:  'back', s: 'back',
+    ArrowLeft:  'left', a: 'left',
+    ArrowRight: 'right',d: 'right',
+    ' ':        'stop',
+  };
+
+  const btnIdOf = { fwd: 'btn-fwd', back: 'btn-back', left: 'btn-left', right: 'btn-right', stop: 'btn-stop' };
+
+  document.addEventListener('keydown', (e) => {
+    const dir = keyDir[e.key];
+    if (!dir) return;
+    e.preventDefault();
+    document.getElementById(btnIdOf[dir])?.classList.add('pressed');
+    startDrive(dir);
+  });
+
+  document.addEventListener('keyup', (e) => {
+    const dir = keyDir[e.key];
+    if (!dir) return;
+    document.getElementById(btnIdOf[dir])?.classList.remove('pressed');
+    if (dir !== 'stop') stopDrive();
+  });
+
+  /* ---------------------------------------------------------------- boot */
+  connect();
+})();
+</script>
+
+<!-- ============================================================ UPLOAD SCRIPT -->
+<script>
+(function () {
+  'use strict';
+
+  const UPLOAD_SERVER = _apiBase();
+  const UPLOAD_API_KEY = window.SIM_DEMO_UPLOAD_API_KEY || '';
+
+  /* ---- elements ---- */
+  const fileInput    = document.getElementById('model-file');
+  const fileDrop     = document.getElementById('file-drop');
+  const fileName     = document.getElementById('file-name');
+  const algoSelect   = document.getElementById('algo-select');
+  const episodesInput= document.getElementById('episodes-input');
+  const uploadBtn    = document.getElementById('upload-btn');
+  const cancelBtn    = document.getElementById('cancel-btn');
+  const evalConsole  = document.getElementById('eval-console');
+  const evalSummary  = document.getElementById('eval-summary');
+  const summaryGrid  = document.getElementById('summary-grid');
+  const evalBadge    = document.getElementById('eval-badge');
+
+  const spawnEvalChk = document.getElementById('spawn-eval-chk');
+  const paperEvalChk = document.getElementById('paper-eval-chk');
+
+  spawnEvalChk.addEventListener('change', () => {
+    episodesInput.disabled = !spawnEvalChk.checked;
+  });
+
+  let evtSource = null;
+
+  /* ---- file picker ---- */
+  fileInput.addEventListener('change', () => {
+    if (fileInput.files.length) {
+      fileName.textContent = fileInput.files[0].name;
+      uploadBtn.disabled = false;
+    }
+  });
+
+  /* ---- drag & drop ---- */
+  fileDrop.addEventListener('dragover', (e) => { e.preventDefault(); fileDrop.classList.add('drag-over'); });
+  fileDrop.addEventListener('dragleave', () => fileDrop.classList.remove('drag-over'));
+  fileDrop.addEventListener('drop', (e) => {
+    e.preventDefault();
+    fileDrop.classList.remove('drag-over');
+    const f = e.dataTransfer?.files[0];
+    if (f && f.name.endsWith('.pth')) {
+      // inject into the file input via DataTransfer
+      const dt = new DataTransfer();
+      dt.items.add(f);
+      fileInput.files = dt.files;
+      fileName.textContent = f.name;
+      uploadBtn.disabled = false;
+    }
+  });
+
+  /* ---- badge helper ---- */
+  function setBadge(state, text) {
+    evalBadge.className = 'visible ' + state;
+    evalBadge.textContent = text;
+  }
+  function hideBadge() { evalBadge.className = ''; }
+
+  /* ---- console helpers ---- */
+  function consoleLog(text, cls = '') {
+    const div = document.createElement('div');
+    if (cls) div.className = cls;
+    div.textContent = text;
+    evalConsole.appendChild(div);
+    evalConsole.scrollTop = evalConsole.scrollHeight;
+  }
+  function clearConsole() {
+    evalConsole.innerHTML = '';
+    evalConsole.classList.add('visible');
+  }
+
+  /* ---- upload ---- */
+  uploadBtn.addEventListener('click', async () => {
+    const file = fileInput.files[0];
+    if (!file) return;
+
+    uploadBtn.disabled = true;
+    const doSubprocess = spawnEvalChk.checked;
+    if (doSubprocess) {
+      cancelBtn.style.display = 'inline-flex';
+      clearConsole();
+      evalSummary.classList.remove('visible');
+      setBadge('running', '⟳ Running');
+    } else {
+      cancelBtn.style.display = 'none';
+      clearConsole();
+    }
+
+    const form = new FormData();
+    form.append('file',     file);
+    form.append('algo',     algoSelect.value);
+    form.append('episodes', episodesInput.value);
+    form.append('spawn_eval', doSubprocess ? 'true' : 'false');
+    form.append('paper_eval', paperEvalChk.checked ? 'true' : 'false');
+
+    const uploadHeaders = {};
+    if (UPLOAD_API_KEY) uploadHeaders['X-API-Key'] = UPLOAD_API_KEY;
+
+    let resp;
+    try {
+      resp = await fetch(`${UPLOAD_SERVER}/upload`, {
+        method: 'POST', body: form, headers: uploadHeaders,
+      });
+    } catch (e) {
+      consoleLog(`[ERROR] Cannot reach upload server at ${UPLOAD_SERVER}`, 'line-err');
+      consoleLog('Make sure upload_server.py is running: python3 upload_server.py', 'line-info');
+      setBadge('error', '✗ Unreachable');
+      uploadBtn.disabled = false;
+      cancelBtn.style.display = 'none';
+      return;
+    }
+
+    const data = await resp.json();
+    if (!resp.ok) {
+      consoleLog(`[ERROR] ${data.error}`, 'line-err');
+      setBadge('error', '✗ Error');
+      uploadBtn.disabled = false;
+      cancelBtn.style.display = 'none';
+      return;
+    }
+
+    if (!data.spawn_eval) {
+      consoleLog(data.message, data.reload_pub ? 'line-ok' : 'line-err');
+      if (evtSource) { evtSource.close(); evtSource = null; }
+      setBadge(data.reload_pub ? 'done' : 'error', data.reload_pub ? '✓ Hot-swap' : '✗ ROS pub failed');
+      uploadBtn.disabled = false;
+      return;
+    }
+
+    consoleLog(data.message + (data.reload_pub === false ? ' (note: /policy_reload publish failed)' : ''), 'line-info');
+    openEvalStream();
+  });
+
+  /* ---- SSE stream ---- */
+  function openEvalStream() {
+    if (evtSource) { evtSource.close(); evtSource = null; }
+
+    evtSource = new EventSource(`${UPLOAD_SERVER}/eval_stream`);
+
+    evtSource.onmessage = (e) => {
+      const line = JSON.parse(e.data);
+      const cls = line.includes('[ERROR]') || line.includes('Error') ? 'line-err'
+                : line.includes('SOLVED') || line.includes('Results saved') ? 'line-ok'
+                : line.includes('[upload_server]') ? 'line-info'
+                : '';
+      consoleLog(line, cls);
+    };
+
+    evtSource.addEventListener('done', (e) => {
+      evtSource.close(); evtSource = null;
+      const snap = JSON.parse(e.data);
+      if (snap.status === 'done') {
+        setBadge('done', '✓ Done');
+        fetchResults();
+      } else {
+        setBadge('error', '✗ ' + snap.status);
+      }
+      cancelBtn.style.display = 'none';
+      uploadBtn.disabled = false;
+    });
+
+    evtSource.onerror = () => {
+      consoleLog('[stream] Connection lost.', 'line-err');
+    };
+  }
+
+  /* ---- cancel ---- */
+  cancelBtn.addEventListener('click', async () => {
+    try {
+      await fetch(`${UPLOAD_SERVER}/eval_cancel`, { method: 'POST' });
+      consoleLog('[upload_server] Cancel signal sent.', 'line-info');
+    } catch {
+      consoleLog('[ERROR] Could not reach server.', 'line-err');
+    }
+  });
+
+  /* ---- results summary ---- */
+  async function fetchResults() {
+    let resp;
+    try { resp = await fetch(`${UPLOAD_SERVER}/eval_results`); }
+    catch { return; }
+    if (!resp.ok) return;
+    const d = await resp.json();
+    const s = d.summary;
+    if (!s) return;
+
+    summaryGrid.innerHTML = '';
+    const fields = [
+      ['Success rate',      (s.success_rate * 100).toFixed(1) + ' %'],
+      ['Episodes',          `${s.episodes_solved} / ${s.episodes_total}`],
+      ['Mean reward',       s.mean_reward > 0 ? '+' + s.mean_reward : String(s.mean_reward)],
+      ['Std reward',        '± ' + s.std_reward],
+      ['Mean WP cleared',   s.mean_waypoints.toFixed(2) + ' / ' + s.total_waypoints_possible],
+      ['Mean steps',        s.mean_steps.toFixed(0)],
+    ];
+    fields.forEach(([label, val]) => {
+      const item = document.createElement('div');
+      item.className = 'summary-item';
+      item.innerHTML = `<label>${label}</label><div class="sval">${val}</div>`;
+      summaryGrid.appendChild(item);
+    });
+
+    evalSummary.classList.add('visible');
+  }
+
+  /* ---- on load: check if an eval is already running ---- */
+  (async () => {
+    try {
+      const r = await fetch(`${UPLOAD_SERVER}/eval_status`);
+      const d = await r.json();
+      if (d.status === 'running') {
+        clearConsole();
+        setBadge('running', '⟳ Running');
+        cancelBtn.style.display = 'inline-flex';
+        uploadBtn.disabled = true;
+        d.tail.forEach(l => consoleLog(l));
+        openEvalStream();
+      }
+    } catch { /* server not up yet */ }
+  })();
+})();
+</script>
+</body>
+</html>

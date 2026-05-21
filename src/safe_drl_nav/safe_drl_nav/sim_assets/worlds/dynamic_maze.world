@@ -1,0 +1,80 @@
+<?xml version="1.0" ?>
+<sdf version="1.6">
+  <world name="drl_dynamic_world">
+    
+    <include>
+      <uri>model://sun</uri>
+    </include>
+    
+    <include>
+      <uri>model://ground_plane</uri>
+    </include>
+
+    <physics type="ode">
+      <real_time_update_rate>1000.0</real_time_update_rate>
+      <max_step_size>0.001</max_step_size>
+      <real_time_factor>1</real_time_factor>
+    </physics>
+
+    <model name="chaos_cylinder">
+      <pose>2.0 0 0.5 0 0 0</pose>
+      <link name="link">
+        <collision name="collision">
+          <geometry>
+            <cylinder><radius>0.3</radius><length>1.0</length></cylinder>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <cylinder><radius>0.3</radius><length>1.0</length></cylinder>
+          </geometry>
+          <material>
+            <script>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+              <name>Gazebo/Red</name>
+            </script>
+          </material>
+        </visual>
+      </link>
+      
+      <plugin name="obstacle_planar_move" filename="libgazebo_ros_planar_move.so">
+        <ros>
+          <namespace>/obstacle</namespace>
+          <remapping>cmd_vel:=cmd_vel</remapping>
+          <remapping>odom:=odom</remapping>
+        </ros>
+        <update_rate>100.0</update_rate>
+        <publish_rate>10.0</publish_rate>
+        <publish_odom>true</publish_odom>
+        <publish_odom_tf>true</publish_odom_tf>
+        <odometry_frame>odom</odometry_frame>
+        <robot_base_frame>link</robot_base_frame>
+        <covariance_x>0.0001</covariance_x>
+        <covariance_y>0.0001</covariance_y>
+        <covariance_yaw>0.01</covariance_yaw>
+      </plugin>
+    </model>
+
+    <model name="wall_1">
+      <pose>4 0 0.5 0 0 0</pose>
+      <static>true</static>
+      <link name="link"><collision name="c"><geometry><box><size>0.2 8 1</size></box></geometry></collision><visual name="v"><geometry><box><size>0.2 8 1</size></box></geometry><material><script><name>Gazebo/DarkGrey</name></script></material></visual></link>
+    </model>
+    <model name="wall_2">
+      <pose>-4 0 0.5 0 0 0</pose>
+      <static>true</static>
+      <link name="link"><collision name="c"><geometry><box><size>0.2 8 1</size></box></geometry></collision><visual name="v"><geometry><box><size>0.2 8 1</size></box></geometry><material><script><name>Gazebo/DarkGrey</name></script></material></visual></link>
+    </model>
+    <model name="wall_3">
+      <pose>0 4 0.5 0 0 0</pose>
+      <static>true</static>
+      <link name="link"><collision name="c"><geometry><box><size>8 0.2 1</size></box></geometry></collision><visual name="v"><geometry><box><size>8 0.2 1</size></box></geometry><material><script><name>Gazebo/DarkGrey</name></script></material></visual></link>
+    </model>
+    <model name="wall_4">
+      <pose>0 -4 0.5 0 0 0</pose>
+      <static>true</static>
+      <link name="link"><collision name="c"><geometry><box><size>8 0.2 1</size></box></geometry></collision><visual name="v"><geometry><box><size>8 0.2 1</size></box></geometry><material><script><name>Gazebo/DarkGrey</name></script></material></visual></link>
+    </model>
+
+  </world>
+</sdf>

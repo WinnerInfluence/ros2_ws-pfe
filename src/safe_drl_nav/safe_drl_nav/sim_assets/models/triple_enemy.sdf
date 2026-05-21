@@ -1,0 +1,53 @@
+<?xml version="1.0" ?>
+<sdf version="1.6">
+  <model name="chaos_swarm">
+    <pose>1.5 0 0.25 0 0 0</pose>
+    <link name="link">
+      
+      <collision name="c1">
+        <pose>0 0 0 0 0 0</pose>
+        <geometry><cylinder><radius>0.2</radius><length>0.5</length></cylinder></geometry>
+      </collision>
+      <visual name="v1">
+        <pose>0 0 0 0 0 0</pose>
+        <geometry><cylinder><radius>0.2</radius><length>0.5</length></cylinder></geometry>
+        <material><ambient>1 0 0 1</ambient><diffuse>1 0 0 1</diffuse></material>
+      </visual>
+
+      <collision name="c2">
+        <pose>0.6 0.8 0 0 0 0</pose>
+        <geometry><cylinder><radius>0.2</radius><length>0.5</length></cylinder></geometry>
+      </collision>
+      <visual name="v2">
+        <pose>0.6 0.8 0 0 0 0</pose>
+        <geometry><cylinder><radius>0.2</radius><length>0.5</length></cylinder></geometry>
+        <material><ambient>1 0 0 1</ambient><diffuse>1 0 0 1</diffuse></material>
+      </visual>
+
+      <collision name="c3">
+        <pose>0.6 -0.8 0 0 0 0</pose>
+        <geometry><cylinder><radius>0.2</radius><length>0.5</length></cylinder></geometry>
+      </collision>
+      <visual name="v3">
+        <pose>0.6 -0.8 0 0 0 0</pose>
+        <geometry><cylinder><radius>0.2</radius><length>0.5</length></cylinder></geometry>
+        <material><ambient>1 0 0 1</ambient><diffuse>1 0 0 1</diffuse></material>
+      </visual>
+
+    </link>
+
+    <plugin name="obstacle_planar_move" filename="libgazebo_ros_planar_move.so">
+      <ros>
+        <namespace>/obstacle</namespace>
+        <remapping>cmd_vel:=cmd_vel</remapping>
+        <remapping>odom:=odom_swarm</remapping>
+      </ros>
+      <update_rate>100.0</update_rate>
+      <publish_rate>10.0</publish_rate>
+      <publish_odom>true</publish_odom>
+      <publish_odom_tf>true</publish_odom_tf>
+      <odometry_frame>odom_swarm</odometry_frame>
+      <robot_base_frame>link</robot_base_frame>
+    </plugin>
+  </model>
+</sdf>

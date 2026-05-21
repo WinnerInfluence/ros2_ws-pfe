@@ -1,0 +1,82 @@
+material Hassan/Floor
+{
+  technique
+  {
+    pass
+    {
+      ambient  0.439 0.392 0.354 1.0
+      diffuse  0.508 0.453 0.409 1.0
+      specular 0.03 0.03 0.03 1.0 4.0
+      texture_unit
+      {
+        texture hassan_floor_uv.png
+        scale 5.0 5.0
+        tex_address_mode wrap
+      }
+    }
+  }
+}
+
+material Hassan/Pillar
+{
+  technique
+  {
+    pass
+    {
+      ambient  0.84 0.82 0.80 1.0
+      diffuse  0.92 0.90 0.88 1.0
+      specular 0.05 0.05 0.05 1.0 4.0
+      texture_unit
+      {
+        texture hassan_pillar_uv.png
+        scale 1.0 0.35
+        tex_address_mode clamp
+      }
+    }
+  }
+}
+
+material Hassan/TowerCore
+{
+  technique
+  {
+    pass
+    {
+      ambient  0.553 0.413 0.280 1.0
+      diffuse  0.618 0.462 0.313 1.0
+      specular 0.04 0.04 0.04 1.0 4.0
+    }
+  }
+}
+
+material Hassan/TowerFace
+{
+  technique
+  {
+    pass
+    {
+      ambient  0.92 0.88 0.80 1.0
+      diffuse  1.0 0.96 0.88 1.0
+      specular 0.05 0.05 0.05 1.0 4.0
+      texture_unit
+      {
+        texture hassan_tower_face.png
+        scale 1.0 1.0
+        tex_address_mode clamp
+      }
+    }
+  }
+}
+
+material Hassan/TowerTop
+{
+  technique
+  {
+    pass
+    {
+      ambient  0.553 0.413 0.280 1.0
+      diffuse  0.618 0.462 0.313 1.0
+      specular 0.05 0.05 0.05 1.0 4.0
+    }
+  }
+}
